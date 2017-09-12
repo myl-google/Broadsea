@@ -16,16 +16,12 @@ cd BroadSea
 
 ## Creating the CDM schema in BigQuery
 
-- Execute the following in the console
-```bash
-wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
-```
-
 - Create a target bigquery dataset, e.g. "cdm", in your cloud project at
   https://bigquery.cloud.google.com
   
 - Execute 
 ``` bash
+wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
 python create_cdm_tables.py -p <project_name> -d <dataset_name>
 ```
 
