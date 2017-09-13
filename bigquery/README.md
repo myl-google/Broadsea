@@ -61,17 +61,18 @@ gsutil cp gs://<bucket_name>/<p12_file_name> ohdsi-bigquery.p12
 
 - Go to https://github.com/OHDSI/Broadsea and search for "Quick Start Broadsea
   Deployment Instructions"
-- Follow the instructions with the following modifications:
-  - Unless you changed the OS default when creating the VM, you should follow
-    the docker installation instructions for Docker CE on Debian.  Make sure to
-  - Use the docker-compose.yml file in ~/Broadsea/bigquery.  Change
-    datasource.password to the default password you entered when creating your
-    cloud sql instance.  Change the IP address in the datasource.url and the
-    flyway.datasource.url to the IP that you noted when creating your cloud sql
-    instance
-  - Use the source_source_daimon.sql file in ~/Broadsea/bigquery.  Change the
-    "project_name" in the source_connection string to the name of your project
-    and the "user" argument to the default compute engine service.  The service
-    account can be found at
-    https://console.cloud.google.com/iam-admin/iam/project with the name "Compute Engine default service account" and will be of the
-    form 1234567-compute@developer.gserviceaccount.com
+- Follow the instructions with the following modifications
+- Unless you changed the OS default when creating the VM, you should follow the
+  docker installation instructions for Docker CE on Debian.  Make sure to
+- Use the docker-compose.yml file in ~/Broadsea/bigquery.  Change
+  datasource.password to the default password you entered when creating your
+  cloud sql instance.  Change the IP address in the datasource.url and the
+  flyway.datasource.url to the IP that you noted when creating your cloud sql
+  instance
+- Use the source_source_daimon.sql file in ~/Broadsea/bigquery.  Change the
+  "project_name" in the source_connection string to the name of your project and
+  the "user" argument to the default compute engine service.  The service
+  account can be found at https://console.cloud.google.com/iam-admin/iam/project
+  with the name "Compute Engine default service account" and will be of the form
+  1234567-compute@developer.gserviceaccount.com
+- To apply the source_source_daimon.sql file

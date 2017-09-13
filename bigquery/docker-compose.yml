@@ -19,7 +19,7 @@ services:
      - WEBAPI_URL=http://localhost:8080
      - env=webapi-postgresql
      - datasource.driverClassName=org.postgresql.Driver
-     - datasource.url=jdbc:postgresql://192.168.99.100:5432/secret-database-name
+     - datasource.url=jdbc:postgresql://192.168.99.100:5432/postgres
      - datasource.cdm.schema=cdm
      - datasource.ohdsi.schema=ohdsi
      - datasource.username=postgres
@@ -28,7 +28,7 @@ services:
      - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
      - spring.batch.repository.tableprefix=ohdsi.BATCH_
      - flyway.datasource.driverClassName=org.postgresql.Driver
-     - flyway.datasource.url=jdbc:postgresql://192.168.99.100:5432/secret-database-name
+     - flyway.datasource.url=jdbc:postgresql://192.168.99.100:5432/postgres
      - flyway.schemas=ohdsi
      - flyway.placeholders.ohdsiSchema=ohdsi
      - flyway.datasource.username=secret-user-name
