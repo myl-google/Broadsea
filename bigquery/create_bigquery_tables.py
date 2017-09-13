@@ -2,12 +2,18 @@ import getopt
 import sys
 import os
 
-USAGE = '%s -p <project_id> -d <bigquery_dataset>' % sys.argv[0]
+USAGE = (sys.argv[0] +
+         " -p <project_id> -d <bigquery_dataset>"
+         " -s <sql_file>"
+         " [-w <comma_separated_whitelist>]")
 
 project=''
 dataset=''
+sql=''
+whitelist=set()
 try:
-  opts, args = getopt.getopt(sys.argv[1:],"hp:d:",["project=","dataset="])
+  opts, args = getopt.getopt(sys.argv[1:],"hp:d:s:w:",
+                             ["project=","dataset=", "sql=", "whitelist="])
   for opt, arg in opts:
     if opt == '-h':
       print USAGE
@@ -16,14 +22,18 @@ try:
       project = arg
     elif opt in ("-d", "--dataset"):
       dataset = arg
-  if len(project) == 0 or len(dataset) == 0:
+    elif opt in ("-s", "--sql"):
+      sql = arg
+    elif opt in ("-w", "--whitelist"):
+      whitelist = set(open(arg).read().split("\n"))
+  if len(project) == 0 or len(dataset) == 0 or len(sql) == 0:
     print USAGE
     sys.exit(1)
 except getopt.GetoptError:
   print USAGE
   sys.exit(1)
 
-sql_commands = open("OMOP CDM ddl - PostgreSQL.sql").readlines()
+sql_commands = open(sql).readlines()
 
 table_name = None
 table_columns = []
@@ -60,4 +70,5 @@ for line in sql_commands:
         else: assert False, "Unknown type: %s" % column_type
         table_columns.append(words[0] + ":" + t)
     elif len(words) >= 2 and words[0] == 'CREATE' and words[1] == 'TABLE':
+      if len(whitelist) > 0 and words[2] in whitelist:
         table_name = words[2]

@@ -9,8 +9,7 @@
   click on the "networking" tab, then click on the default network then click on
   the "ephemeral" external ip, create a named ip address and select that.  Note
   the IP address for later
-- Adjust any other settings as desired or leave the defaults.  The VM will fall
-  into the free tier if you change the machine type to "micro"
+- Adjust any other settings as desired or leave the defaults
 - Click "create"
 - In the list of instances, click "SSH" to open a console
 - Execute the following in the console
@@ -22,13 +21,13 @@ cd BroadSea/bigquery
 
 ## Creating the CDM schema in BigQuery
 
-- Create a target bigquery dataset, e.g. "cdm", in your cloud project at
+- Create two bigquery datasets named "cdm" and "ohdsi" in your cloud project at
   https://bigquery.cloud.google.com
 - Execute the following where <dataset_name> is the name of the dataset you just
   created and <project_name> is the name of your project
 ``` bash
 wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
-python create_cdm_tables.py -p <project_name> -d <dataset_name>
+python create_bigquery_tables.py -p <project_name> -d cdm -s "OMOP CDM ddl - PostgreSQL.sql"
 ```
 - At this point, you can either load data into the new schema or continue the
   rest of the setup using the empty database
@@ -47,11 +46,6 @@ PostgreSQL instance in Cloud SQL:
   external IP of the VM that you noted earlier
 - Adjust any other settings as desired or leave the defaults
 - Click "create"
-- Go to
-  https://console.cloud.google.com/apis/api/sqladmin.googleapis.com/overview and
-  click "enable".  (This is necessary to allow the "gcloud sql" command that is
-  used later)
--
 - Make a note of the name of the instance, the default password, and the IP
   address for later
 
@@ -72,9 +66,20 @@ gsutil cp gs://<bucket_name>/<p12_file_name> ohdsi-bigquery.p12
 
 ## Run the BroadSea deployment instructions
 
+- Do all of the following under ~/Broadsea/bigquery
+- Edit the docker-compose.yml file to change datasource.password and
+  flyway.datasource.password to the cloud sql password that you configured
+  earlier.  Change the IP address in datasource.url and flyway.datasource.url to
+  the IP that you noted for the cloud sql instance
+- Edit the source_source_daimon.sql file to change the "project_name" in the
+  source_connection string to the name of your project and the "user" argument
+  to the default compute engine service account.  The account can be found at
+  https://console.cloud.google.com/iam-admin/iam/project with the name "Compute
+  Engine default service account" and will be of the form
+  1234567-compute@developer.gserviceaccount.com
 - Go to https://github.com/OHDSI/Broadsea and search for "Quick Start Broadsea
-  Deployment Instructions"
-- Follow the instructions with the following modifications
+  Deployment Instructions".  Follow the instructions with the following
+  modifications
 - Unless you changed the OS default when creating the VM, you should follow the
   Docker installation instructions for Docker CE on Debian
 - On linux, you need to install Docker Compose after you install CE.  Follow the
@@ -82,21 +87,24 @@ gsutil cp gs://<bucket_name>/<p12_file_name> ohdsi-bigquery.p12
 - On linux, after installing Docker Compose follow the "Manage docker as
   non-root user" post-installation steps at
   https://docs.docker.com/engine/installation/linux/linux-postinstall/
-- Edit the docker-compose.yml file in ~/Broadsea/bigquery to change
-  datasource.password and flyway.datasource.password to the default cloud sql
-  password.  Change the IP address in datasource.url and flyway.datasource.url
-  to the IP that you noted for the cloud sql instance
-- Edit the source_source_daimon.sql file in ~/Broadsea/bigquery to change the
-  "project_name" in the source_connection string to the name of your project and
-  the "user" argument to the default compute engine service account.  The
-  account can be found at https://console.cloud.google.com/iam-admin/iam/project
-  with the name "Compute Engine default service account" and will be of the form
-  1234567-compute@developer.gserviceaccount.com
 - To apply the source_source_daimon.sql file after the "docker-compose down" use
-  the following commmands where <instance_name> is the name of the cloud sql
+  the following commmands where <cloud_sql_ip> is the IP of the cloud sql
   instance
 
 ```bash
 sudo apt-get install postgresql
-gcloud sql connect <instance_name> --user postgres
+export CLOUD_SQL_IP=<cloud_sql_ip>
+psql "host=<cloud_sql_ip> dbname=postgres user=postgres" -f source_source_daimon.sql
+```
+
+- Confirm that results_tables_whitelist.txt has the same tables as listed at the
+  bottom of
+  http://www.ohdsi.org/web/wiki/doku.php?id=documentation:software:webapi:multiple_datasets_configuration
+- Create the results tables by running the following commands where
+  <cloud_sql_ip> is the IP of the cloud sql instance
+
+``` bash
+export CLOUD_SQL_IP=<cloud_sql_ip>
+pg_dump "host=$CLOUD_SQL_IP dbname=postgres user=postgres" > ohdsi.sq
+python create_bigquery_tables.py -p <project_name> -d ohdsi -w results_tables_whitelist.txt
 ```
