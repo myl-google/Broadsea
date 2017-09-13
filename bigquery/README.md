@@ -89,7 +89,15 @@ gsutil cp gs://$BUCKET_NAME/$P12_FILE ohdsi-bigquery.p12
 - On linux, after installing Docker Compose follow the "Manage docker as
   non-root user" post-installation steps at
   https://docs.docker.com/engine/installation/linux/linux-postinstall/
-- To apply the source_source_daimon.sql file after the "docker-compose down" use
+- Whenever you run "docker-compose up -d" you can use the following command
+  after the containers have fully started to view the weblogs and confirm there
+  are no errors
+
+``` bash
+./copy-weblogs.sh
+```
+
+- To apply the source_source_daimon.sql file after "docker-compose down" use
   the following commmands where <cloud_sql_ip> is the IP of the cloud sql
   instance
 
@@ -112,4 +120,18 @@ export CLOUD_SQL_IP=<cloud_sql_ip>
 export PROJECT=`gcloud config get-value project`
 pg_dump "host=$CLOUD_SQL_IP dbname=postgres user=postgres" > ohdsi.sq
 python create_bigquery_tables.py -p $PROJECT -d ohdsi -s ohdsi.sql -w results_tables_whitelist.txt
+```
+
+## Open Atlas from your local machine
+
+- Install the cloud SDK on your local machine where you want to view Atlas in
+  the web browser (i.e. not the VM) https://cloud.google.com/sdk/downloads
+- Run the following to create an SSH tunnel with port forwarding from your local
+  machine to the VM:
+
+``` bash
+export VM_NAME=<the instance name of the VM>
+export VM_ZONE=<the zone of the VM>
+export PROJECT=`gcloud config get-value project`
+gcloud compute ssh $VM_NAME --project $PROJECT --zone $VM_ZONE --ssh-flag="-L" --ssh-flag="8080:localhost:8080" --ssh-flag="-L" --ssh-flag="8787:localhost:8787"
 ```
