@@ -23,11 +23,11 @@ cd BroadSea/bigquery
 
 - Create two bigquery datasets named "cdm" and "ohdsi" in your cloud project at
   https://bigquery.cloud.google.com
-- Execute the following where <dataset_name> is the name of the dataset you just
-  created and <project_name> is the name of your project
+- Execute the following
 ``` bash
+export PROJECT=`gcloud config get-value project`
 wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
-python create_bigquery_tables.py -p <project_name> -d cdm -s "OMOP CDM ddl - PostgreSQL.sql"
+python create_bigquery_tables.py -p $PROJECT -d cdm -s "OMOP CDM ddl - PostgreSQL.sql"
 ```
 - At this point, you can either load data into the new schema or continue the
   rest of the setup using the empty database
@@ -61,7 +61,9 @@ PostgreSQL instance in Cloud SQL:
   bucket name you just created and the name of the p12 file you uploaded:
 
 ``` bash
-gsutil cp gs://<bucket_name>/<p12_file_name> ohdsi-bigquery.p12
+export BUCKET_NAME=<bucket that you just created>
+export P12_FILE=<p12 file that you just uploaded>
+gsutil cp gs://$BUCKET_NAME/$P12_FILE ohdsi-bigquery.p12
 ```
 
 ## Run the BroadSea deployment instructions
@@ -97,6 +99,8 @@ export CLOUD_SQL_IP=<cloud_sql_ip>
 psql "host=<cloud_sql_ip> dbname=postgres user=postgres" -f source_source_daimon.sql
 ```
 
+## Copy a subset of the ohdsi schema from postgres into bigquery
+
 - Confirm that results_tables_whitelist.txt has the same tables as listed at the
   bottom of
   http://www.ohdsi.org/web/wiki/doku.php?id=documentation:software:webapi:multiple_datasets_configuration
@@ -105,6 +109,7 @@ psql "host=<cloud_sql_ip> dbname=postgres user=postgres" -f source_source_daimon
 
 ``` bash
 export CLOUD_SQL_IP=<cloud_sql_ip>
+export PROJECT=`gcloud config get-value project`
 pg_dump "host=$CLOUD_SQL_IP dbname=postgres user=postgres" > ohdsi.sq
-python create_bigquery_tables.py -p <project_name> -d ohdsi -w results_tables_whitelist.txt
+python create_bigquery_tables.py -p $PROJECT -d ohdsi -s ohdsi.sql -w results_tables_whitelist.txt
 ```
