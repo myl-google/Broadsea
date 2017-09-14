@@ -122,16 +122,19 @@ pg_dump "host=$CLOUD_SQL_IP dbname=postgres user=postgres" > ohdsi.sq
 python create_bigquery_tables.py -p $PROJECT -d ohdsi -s ohdsi.sql -w results_tables_whitelist.txt
 ```
 
-## Open Atlas from your local machine
+## Open Atlas and RStudio from your local machine
 
 - Install the cloud SDK on your local machine where you want to view Atlas in
   the web browser (i.e. not the VM) https://cloud.google.com/sdk/downloads
 - Run the following to create an SSH tunnel with port forwarding from your local
-  machine to the VM:
+  machine to the VM substituting the appropriate values for VM_NAME and VM_ZONE
 
 ``` bash
 export VM_NAME=<the instance name of the VM>
 export VM_ZONE=<the zone of the VM>
-export PROJECT=`gcloud config get-value project`
+export PROJECT=<project name>
 gcloud compute ssh $VM_NAME --project $PROJECT --zone $VM_ZONE --ssh-flag="-L" --ssh-flag="8080:localhost:8080" --ssh-flag="-L" --ssh-flag="8787:localhost:8787"
 ```
+
+- To open RStudio on your local machine visit http://localhost:8787
+- To open Atlas on your local machine visit http://localhost:8080/atlas
