@@ -1,6 +1,8 @@
+cohort
 cohort_inclusion
 cohort_inclusion_result
 cohort_inclusion_stats
+cohort_summary_stats
 feas_study_inclusion_stats
 feas_study_index_stats
 feas_study_result
