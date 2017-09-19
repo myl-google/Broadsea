@@ -63,12 +63,12 @@ for line in sql_commands:
         elif (column_type == "character"): t = "string"
         elif (column_type == "varchar"): t = "string"
         elif (column_type == "text"): t = "string"
-        elif (column_type == "character"): t = "string"
+        elif (column_type == "char"): t = "string"
         elif (column_type == "double"): t = "float"
         elif (column_type == "numeric"): t = "float"
         elif (column_type == "date"): t = "date"
         else: assert False, "Unknown type: %s" % column_type
         table_columns.append(words[0] + ":" + t)
     elif len(words) >= 2 and words[0] == 'CREATE' and words[1] == 'TABLE':
-      if len(whitelist) > 0 and words[2] in whitelist:
+      if len(whitelist) == 0 or words[2] in whitelist:
         table_name = words[2]
