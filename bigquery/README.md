@@ -21,8 +21,9 @@ cd BroadSea/bigquery
 
 ## Creating the CDM schema in BigQuery
 
-- Create two bigquery datasets named "cdm" and "ohdsi" in your cloud project at
-  https://bigquery.cloud.google.com
+- Create three bigquery datasets named "cdm", "ohdsi", and "temp" in your cloud
+project at https://bigquery.cloud.google.com.  Give the temp dataset an
+expiration of one day
 - Execute the following
 ``` bash
 export PROJECT=`gcloud config get-value project`
