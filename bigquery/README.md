@@ -16,15 +16,15 @@
 ```bash
 sudo apt-get install git
 git clone https://github.com/myl-google/Broadsea.git
-cd BroadSea/bigquery
+cd Broadsea/bigquery
 ```
 
 ## Creating the CDM schema in BigQuery
 
-- Create two bigquery datasets named "cdm" and "ohdsi" in your cloud project at
+- <a href="https://cloud.google.com/bigquery/quickstart-web-ui#create_a_dataset">Create two bigquery datasets</a> named "cdm" and "ohdsi" in your cloud project at
   https://bigquery.cloud.google.com
-- Execute the following
-``` bash
+- After the datasets have been created, return to the VM and execute the following in bash
+
 export PROJECT=`gcloud config get-value project`
 wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
 python create_bigquery_tables.py -p $PROJECT -d cdm -s "OMOP CDM ddl - PostgreSQL.sql"
@@ -43,7 +43,7 @@ PostgreSQL instance in Cloud SQL:
 - Enter an instance name and default password
 - Choose a region and zone or leave the defaults
 - Click on "configuration options", select "authorize networks", and add the
-  external IP of the VM that you noted earlier
+  external IP followed by /32 of the VM that you noted earlier.
 - Adjust any other settings as desired or leave the defaults
 - Click "create"
 - Make a note of the name of the instance, the default password, and the IP
@@ -116,9 +116,10 @@ psql "host=<cloud_sql_ip> dbname=postgres user=postgres" -f source_source_daimon
   <cloud_sql_ip> is the IP of the cloud sql instance
 
 ``` bash
+sudo apt-get install postgresql-client
 export CLOUD_SQL_IP=<cloud_sql_ip>
 export PROJECT=`gcloud config get-value project`
-pg_dump "host=$CLOUD_SQL_IP dbname=postgres user=postgres" > ohdsi.sq
+pg_dump "host=$CLOUD_SQL_IP dbname=postgres user=postgres" > ohdsi.sql
 python create_bigquery_tables.py -p $PROJECT -d ohdsi -s ohdsi.sql -w results_tables_whitelist.txt
 ```
 
@@ -135,6 +136,7 @@ export VM_ZONE=<the zone of the VM>
 export PROJECT=<project name>
 gcloud compute ssh $VM_NAME --project $PROJECT --zone $VM_ZONE --ssh-flag="-L" --ssh-flag="8080:localhost:8080" --ssh-flag="-L" --ssh-flag="8787:localhost:8787"
 ```
+If you are unable to connect, you may need to add a <a href="https://cloud.google.com/compute/docs/vpc/firewalls">firewall rule</a> for ports 22 and 80. 
 
 - To open RStudio on your local machine visit http://localhost:8787
 - To open Atlas on your local machine visit http://localhost:8080/atlas
