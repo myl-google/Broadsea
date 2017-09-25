@@ -21,10 +21,11 @@ cd Broadsea/bigquery
 
 ## Creating the CDM schema in BigQuery
 
-- <a href="https://cloud.google.com/bigquery/quickstart-web-ui#create_a_dataset">Create two bigquery datasets</a> named "cdm" and "ohdsi" in your cloud project at
-  https://bigquery.cloud.google.com
-- After the datasets have been created, return to the VM and execute the following in bash
-
+- Create three bigquery datasets named "cdm", "ohdsi", and "temp" in your cloud
+project at https://bigquery.cloud.google.com.  Give the temp dataset an
+expiration of one day
+- After the datasets are created, return to the VM and execute the following
+``` bash
 export PROJECT=`gcloud config get-value project`
 wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
 python create_bigquery_tables.py -p $PROJECT -d cdm -s "OMOP CDM ddl - PostgreSQL.sql"

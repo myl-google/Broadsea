@@ -15,6 +15,7 @@ services:
     volumes:
      - .:/tmp/drivers/:ro
      - .:/tmp/achilles-data-reports/:ro
+     - ./supervisor:/var/log/supervisor/:rw
     environment:
      - WEBAPI_URL=http://localhost:8080
      - env=webapi-postgresql
