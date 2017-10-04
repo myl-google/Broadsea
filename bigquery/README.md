@@ -137,7 +137,6 @@ export VM_ZONE=<the zone of the VM>
 export PROJECT=<project name>
 gcloud compute ssh $VM_NAME --project $PROJECT --zone $VM_ZONE --ssh-flag="-L" --ssh-flag="8080:localhost:8080" --ssh-flag="-L" --ssh-flag="8787:localhost:8787"
 ```
-If you are unable to connect, you may need to add a <a href="https://cloud.google.com/compute/docs/vpc/firewalls">firewall rule</a> for ports 22 and 80. 
 
 - To open RStudio on your local machine visit http://localhost:8787
 - To open Atlas on your local machine visit http://localhost:8080/atlas
