@@ -16,7 +16,7 @@
 ```bash
 sudo apt-get install git
 git clone https://github.com/myl-google/Broadsea.git
-cd BroadSea/bigquery
+cd Broadsea/bigquery
 ```
 
 ## Creating the CDM schema in BigQuery
@@ -24,7 +24,7 @@ cd BroadSea/bigquery
 - Create three bigquery datasets named "cdm", "ohdsi", and "temp" in your cloud
 project at https://bigquery.cloud.google.com.  Give the temp dataset an
 expiration of one day
-- Execute the following
+- After the datasets are created, return to the VM and execute the following
 ``` bash
 export PROJECT=`gcloud config get-value project`
 wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
@@ -44,7 +44,7 @@ PostgreSQL instance in Cloud SQL:
 - Enter an instance name and default password
 - Choose a region and zone or leave the defaults
 - Click on "configuration options", select "authorize networks", and add the
-  external IP of the VM that you noted earlier
+  external IP of the VM that you noted earlier.
 - Adjust any other settings as desired or leave the defaults
 - Click "create"
 - Make a note of the name of the instance, the default password, and the IP
@@ -117,9 +117,10 @@ psql "host=<cloud_sql_ip> dbname=postgres user=postgres" -f source_source_daimon
   <cloud_sql_ip> is the IP of the cloud sql instance
 
 ``` bash
+sudo apt-get install postgresql-client
 export CLOUD_SQL_IP=<cloud_sql_ip>
 export PROJECT=`gcloud config get-value project`
-pg_dump "host=$CLOUD_SQL_IP dbname=postgres user=postgres" > ohdsi.sq
+pg_dump "host=$CLOUD_SQL_IP dbname=postgres user=postgres" > ohdsi.sql
 python create_bigquery_tables.py -p $PROJECT -d ohdsi -s ohdsi.sql -w results_tables_whitelist.txt
 ```
 
