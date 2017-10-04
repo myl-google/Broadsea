@@ -44,7 +44,7 @@ PostgreSQL instance in Cloud SQL:
 - Enter an instance name and default password
 - Choose a region and zone or leave the defaults
 - Click on "configuration options", select "authorize networks", and add the
-  external IP followed by /32 of the VM that you noted earlier.
+  external IP of the VM that you noted earlier.
 - Adjust any other settings as desired or leave the defaults
 - Click "create"
 - Make a note of the name of the instance, the default password, and the IP
