@@ -14,6 +14,7 @@
 - In the list of instances, click "SSH" to open a console
 - Execute the following in the console
 ```bash
+sudo apt-get update
 sudo apt-get install git
 git clone https://github.com/myl-google/Broadsea.git
 cd Broadsea/bigquery
@@ -91,13 +92,7 @@ gsutil cp gs://$BUCKET_NAME/$P12_FILE ohdsi-bigquery.p12
   non-root user" post-installation steps at
   https://docs.docker.com/engine/installation/linux/linux-postinstall/
 - Whenever you run "docker-compose up -d" you can use the following command
-  after the containers have fully started to view the weblogs and confirm there
-  are no errors
-
-``` bash
-./copy-weblogs.sh
-```
-
+  you can view the weblogs in the Broadsea/bigquery/supervisor directory
 - To apply the source_source_daimon.sql file after "docker-compose down" use
   the following commmands where <cloud_sql_ip> is the IP of the cloud sql
   instance
@@ -105,7 +100,7 @@ gsutil cp gs://$BUCKET_NAME/$P12_FILE ohdsi-bigquery.p12
 ```bash
 sudo apt-get install postgresql
 export CLOUD_SQL_IP=<cloud_sql_ip>
-psql "host=<cloud_sql_ip> dbname=postgres user=postgres" -f source_source_daimon.sql
+psql "host=$CLOUD_SQL_IP dbname=postgres user=postgres" -f source_source_daimon.sql
 ```
 
 ## Copy a subset of the ohdsi schema from postgres into bigquery
