@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: broadsea-pod
+spec:
+  containers:
+    - name: broadsea-methods
+      image: ohdsi/broadsea-methodslibrary
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 8787
+          hostPort: 8787
+        - containerPort: 6111
+          hostPort: 6111

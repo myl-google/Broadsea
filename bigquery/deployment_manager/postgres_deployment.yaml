@@ -1,0 +1,8 @@
+resources:
+  - name: ohdsiInstance
+    type: sqladmin.v1beta4.instance
+    properties:
+      gceZone: us-central1-b
+      instanceType: CLOUD_SQL_INSTANCE
+      backendType: SECOND_GEN
+

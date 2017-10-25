@@ -20,6 +20,29 @@ git clone https://github.com/myl-google/Broadsea.git
 cd Broadsea/bigquery
 ```
 
+### Deployment manager
+
+gcloud compute instances describe broadsea-deployment-broadsea-vm
+gcloud deployment-manager deployments describe broadsea-deployment
+gcloud deployment-manager deployments create broadsea-deployment --config broadsea_deployment.yaml
+gcloud deployment-manager deployments delete broadsea-deployment 
+
+see if starschema can already fetch from default credentials with the right arguments (seems like it can be done with minor code changes)
+confirm credentials are in the vm
+confirm credentials are in the container
+figure out if bigquery can authorize from the vm and from the container (make code changes to starschema if necessary)
+try to add a secret to the broadsea_manifest (or figure out how to authorize in the container)
+run both broadsea containers in one vm
+add external ip to vm
+create postgresql instance and permission the vm ip address
+populate source table in postgres on startup
+set the correct postgres ip from the vm
+dump the table schemas and convert them to deployment manager
+create the tables in the datasets (will need to keep the schema up to date)
+build the broadsea images and host them on gcr (faster and you can also test them)
+get the bigquery driver into the container - may need to build your own image to make this work
+
+
 ### Alternative 
 
 - create two external ip addresses in cloud shell
@@ -42,7 +65,9 @@ TODO
 
 # Create gke cluster 
 gcloud components install kubectl
-gcloud container clusters create broadsea-cluster
+gcloud container clusters create broadsea-cluster --num-nodes=1
+# Can't be used in combination with --num-nodes=1 --machine-type=f1-micro
+gcloud alpha container clusters create broadsea-cluster --enable-kubernetes-alpha # until 1.8 is available
 
 # Deploy both containers
 kubectl create secret generic ohdsi-bigquery --from-file=./ohdsi-bigquery.p12 # https://kubernetes.io/docs/concepts/configuration/secret/
@@ -52,6 +77,7 @@ kubectl create secret generic ohdsi-bigquery --from-file=./ohdsi-bigquery.p12 # 
 # (cancelled) copy the p12 file using a gcs command run as part of starting the container (need to ensure gsutil is installed, also need to authenticate from inside the container) - could use a kubectl cp before running anything and on any restart
 # TODO - set environment variables with jdbc urls, passwords, etc. using --env="var=value" on the run command or in the yaml file
 kubectl run broadsea-methods --image=ohdsi/broadsea-methodslibrary --port=8787
+kubectl create -f broadsea
 # Use a multi-container pod https://lukemarsden.github.io/docs/user-guide/pods/multi-container/
 
 # Port forwarding

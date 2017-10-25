@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-echo
+spec:
+  containers:
+    - name: simple-echo
+      image: gcr.io/google-containers/busybox
+      command: ['nc', '-p', '8080', '-l', '-l', '-e', 'echo', 'hello world!']
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 8080
+          hostPort: 8080
