@@ -1,8 +1,22 @@
 resources:
-  - name: ohdsiInstance
+  - name: postgresInstance
     type: sqladmin.v1beta4.instance
     properties:
-      gceZone: us-central1-b
-      instanceType: CLOUD_SQL_INSTANCE
-      backendType: SECOND_GEN
-
+      name: broadsea-postgres2 # TODO change
+      databaseVersion: POSTGRES_9_6
+      gceZone: us-central1-a
+      settings:
+        tier: db-custom-1-3840
+        ipConfiguration:
+          authorizedNetworks:
+          - name: broadsea-vm
+            value: 35.184.150.235
+  - name: postgresUser
+    type: sqladmin.v1beta4.user
+    metadata:
+      dependsOn:
+      - postgresInstance
+    properties:
+      instance: broadsea-postgres2 # TODO change
+      name: postgres
+      password: ohdsi

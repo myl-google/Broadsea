@@ -13,8 +13,6 @@
 # limitations under the License.
 
 imports:
-- path: echo_manifest.yaml
-  name: echo_manifest
 - path: broadsea_methods_manifest.yaml
   name: broadsea_methods_manifest
 - path: broadsea_webtools_manifest.yaml
@@ -22,12 +20,6 @@ imports:
 - path: container_vm.jinja
 
 resources:
-  - name: my-container-vm
-    type: container_vm.jinja
-    properties:
-      zone: us-central1-a
-      containerImage: family/container-vm
-      containerManifest: echo_manifest
   - name: methods-vm
     type: container_vm.jinja
     properties:
