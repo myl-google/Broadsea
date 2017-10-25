@@ -24,11 +24,13 @@ resources:
     type: container_vm.jinja
     properties:
       zone: us-central1-a
+      region: us-central1
       containerImage: family/container-vm
       containerManifest: broadsea_methods_manifest
   - name: webtools-vm
     type: container_vm.jinja
     properties:
       zone: us-central1-a
+      region: us-central1
       containerImage: family/container-vm
       containerManifest: broadsea_webtools_manifest

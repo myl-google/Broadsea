@@ -11,10 +11,12 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+    region: {{ RegionComputeUrl(env['project'], properties['region']) }}
 #}
 
 {% set COMPUTE_URL_BASE = 'https://www.googleapis.com/compute/v1/' %}
 {% set BASE_NAME = env['deployment'] + '-' + env['name'] %}
+{% set ADDRESS_NAME = env['deployment'] + env['name'] + '-address' %}
 
 {% macro GlobalComputeUrl(project, collection, name) -%}
 {{ COMPUTE_URL_BASE }}projects/{{ project }}/global/{{ collection }}/{{ name }}
@@ -24,7 +26,17 @@ limitations under the License.
 {{ COMPUTE_URL_BASE }}projects/{{ project }}/zones/{{ zone }}/{{ collection }}/{{ name }}
 {%- endmacro %}
 
+{% macro RegionComputeUrl(project, region) -%}
+{{ COMPUTE_URL_BASE }}projects/{{ project }}/regions/{{ region }}
+{%- endmacro %}
+
 resources:
+- name: {{ ADDRESS_NAME }}
+  type: compute.beta.address
+  properties:
+    status: RESERVED
+    addressType: EXTERNAL
+    region: {{ properties['region'] }}
 - name: {{ BASE_NAME }}
   type: compute.v1.instance
   properties:
@@ -47,4 +59,5 @@ resources:
       - accessConfigs:
           - name: external-nat
             type: ONE_TO_ONE_NAT
+            natIP: $(ref.{{ ADDRESS_NAME }}.address)
         network: {{ GlobalComputeUrl(env['project'],  'networks', 'default') }}

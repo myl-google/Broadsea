@@ -27,9 +27,9 @@ gcloud deployment-manager deployments describe broadsea-deployment
 gcloud deployment-manager deployments create broadsea-deployment --config broadsea_deployment.yaml
 gcloud deployment-manager deployments delete broadsea-deployment 
 
-add external ip to vm
 permission postgres to the vm ip address
-run both broadsea containers in one vm
+switch to cos
+run both broadsea containers in one vm (may need to change to kubernetes or cos)
 
 dump the table schemas and convert them to deployment manager
 create the tables in the datasets (will need to keep the schema up to date)
@@ -39,11 +39,11 @@ confirm credentials are in the vm
 confirm credentials are in the container
 figure out if bigquery can authorize from the vm and from the container (make code changes to starschema if necessary)
 try to add a secret to the broadsea_manifest (or figure out how to authorize in the container)
-populate source table in postgres on startup
-set the correct postgres ip from the vm
-build the broadsea images and host them on gcr (faster and you can also test them)
-get the bigquery driver into the container - may need to build your own image to make this work; could also check it into the webapi install; could also check it alongside the main broadsea dockerfile
 
+populate source table in postgres on startup
+set the correct postgres ip in the environment variable in the vm
+get the bigquery driver into the container - may need to build your own image to make this work; could also check it into the webapi install; could also check it alongside the main broadsea dockerfile
+build the broadsea images and host them on gcr (faster and you can also test them)
 
 ### Alternative 
 
