@@ -128,3 +128,1157 @@ resources:
     instance: {{BASE_NAME}}-postgres
     name: postgres
     password: ohdsi
+- name: tempDatasetResource
+  type: bigquery.v2.dataset
+  properties:
+    datasetReference:
+      datasetId: {{ properties['tempDataset'] }}
+    defaultTableExpirationMs: 86400000
+- name: cdmDatasetResource
+  type: bigquery.v2.dataset
+  properties:
+    datasetReference:
+      datasetId: {{ properties['cdmDataset'] }}
+- name: ohdsiDatasetResource
+  type: bigquery.v2.dataset
+  properties:
+    datasetReference:
+      datasetId: {{ properties['ohdsiDataset'] }}
+{# Generated bigquery schema below here #}
+- name: concept
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: concept
+    schema:
+      fields:
+      - name: concept_id
+        type: integer
+      - name: concept_name
+        type: string
+      - name: domain_id
+        type: string
+      - name: vocabulary_id
+        type: string
+      - name: concept_class_id
+        type: string
+      - name: standard_concept
+        type: string
+      - name: concept_code
+        type: string
+      - name: valid_start_date
+        type: date
+      - name: valid_end_date
+        type: date
+      - name: invalid_reason
+        type: string
+- name: vocabulary
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: vocabulary
+    schema:
+      fields:
+      - name: vocabulary_id
+        type: string
+      - name: vocabulary_name
+        type: string
+      - name: vocabulary_reference
+        type: string
+      - name: vocabulary_version
+        type: string
+      - name: vocabulary_concept_id
+        type: integer
+- name: domain
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: domain
+    schema:
+      fields:
+      - name: domain_id
+        type: string
+      - name: domain_name
+        type: string
+      - name: domain_concept_id
+        type: integer
+- name: concept_class
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: concept_class
+    schema:
+      fields:
+      - name: concept_class_id
+        type: string
+      - name: concept_class_name
+        type: string
+      - name: concept_class_concept_id
+        type: integer
+- name: concept_relationship
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: concept_relationship
+    schema:
+      fields:
+      - name: concept_id_1
+        type: integer
+      - name: concept_id_2
+        type: integer
+      - name: relationship_id
+        type: string
+      - name: valid_start_date
+        type: date
+      - name: valid_end_date
+        type: date
+      - name: invalid_reason
+        type: string
+- name: relationship
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: relationship
+    schema:
+      fields:
+      - name: relationship_id
+        type: string
+      - name: relationship_name
+        type: string
+      - name: is_hierarchical
+        type: string
+      - name: defines_ancestry
+        type: string
+      - name: reverse_relationship_id
+        type: string
+      - name: relationship_concept_id
+        type: integer
+- name: concept_synonym
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: concept_synonym
+    schema:
+      fields:
+      - name: concept_id
+        type: integer
+      - name: concept_synonym_name
+        type: string
+      - name: language_concept_id
+        type: integer
+- name: concept_ancestor
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: concept_ancestor
+    schema:
+      fields:
+      - name: ancestor_concept_id
+        type: integer
+      - name: descendant_concept_id
+        type: integer
+      - name: min_levels_of_separation
+        type: integer
+      - name: max_levels_of_separation
+        type: integer
+- name: source_to_concept_map
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: source_to_concept_map
+    schema:
+      fields:
+      - name: source_code
+        type: string
+      - name: source_concept_id
+        type: integer
+      - name: source_vocabulary_id
+        type: string
+      - name: source_code_description
+        type: string
+      - name: target_concept_id
+        type: integer
+      - name: target_vocabulary_id
+        type: string
+      - name: valid_start_date
+        type: date
+      - name: valid_end_date
+        type: date
+      - name: invalid_reason
+        type: string
+- name: drug_strength
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: drug_strength
+    schema:
+      fields:
+      - name: drug_concept_id
+        type: integer
+      - name: ingredient_concept_id
+        type: integer
+      - name: amount_value
+        type: float
+      - name: amount_unit_concept_id
+        type: integer
+      - name: numerator_value
+        type: float
+      - name: numerator_unit_concept_id
+        type: integer
+      - name: denominator_value
+        type: float
+      - name: denominator_unit_concept_id
+        type: integer
+      - name: box_size
+        type: integer
+      - name: valid_start_date
+        type: date
+      - name: valid_end_date
+        type: date
+      - name: invalid_reason
+        type: string
+- name: cohort_definition
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: cohort_definition
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: cohort_definition_name
+        type: string
+      - name: cohort_definition_description
+        type: string
+      - name: definition_type_concept_id
+        type: integer
+      - name: cohort_definition_syntax
+        type: string
+      - name: subject_concept_id
+        type: integer
+      - name: cohort_initiation_date
+        type: date
+- name: attribute_definition
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: attribute_definition
+    schema:
+      fields:
+      - name: attribute_definition_id
+        type: integer
+      - name: attribute_name
+        type: string
+      - name: attribute_description
+        type: string
+      - name: attribute_type_concept_id
+        type: integer
+      - name: attribute_syntax
+        type: string
+- name: cdm_source
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: cdm_source
+    schema:
+      fields:
+      - name: cdm_source_name
+        type: string
+      - name: cdm_source_abbreviation
+        type: string
+      - name: cdm_holder
+        type: string
+      - name: source_description
+        type: string
+      - name: source_documentation_reference
+        type: string
+      - name: cdm_etl_reference
+        type: string
+      - name: source_release_date
+        type: date
+      - name: cdm_release_date
+        type: date
+      - name: cdm_version
+        type: string
+      - name: vocabulary_version
+        type: string
+- name: person
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: person
+    schema:
+      fields:
+      - name: person_id
+        type: integer
+      - name: gender_concept_id
+        type: integer
+      - name: year_of_birth
+        type: integer
+      - name: month_of_birth
+        type: integer
+      - name: day_of_birth
+        type: integer
+      - name: birth_datetime
+        type: timestamp
+      - name: race_concept_id
+        type: integer
+      - name: ethnicity_concept_id
+        type: integer
+      - name: location_id
+        type: integer
+      - name: provider_id
+        type: integer
+      - name: care_site_id
+        type: integer
+      - name: person_source_value
+        type: string
+      - name: gender_source_value
+        type: string
+      - name: gender_source_concept_id
+        type: integer
+      - name: race_source_value
+        type: string
+      - name: race_source_concept_id
+        type: integer
+      - name: ethnicity_source_value
+        type: string
+      - name: ethnicity_source_concept_id
+        type: integer
+- name: observation_period
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: observation_period
+    schema:
+      fields:
+      - name: observation_period_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: observation_period_start_date
+        type: date
+      - name: observation_period_start_datetime
+        type: timestamp
+      - name: observation_period_end_date
+        type: date
+      - name: observation_period_end_datetime
+        type: timestamp
+      - name: period_type_concept_id
+        type: integer
+- name: specimen
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: specimen
+    schema:
+      fields:
+      - name: specimen_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: specimen_concept_id
+        type: integer
+      - name: specimen_type_concept_id
+        type: integer
+      - name: specimen_date
+        type: date
+      - name: specimen_datetime
+        type: timestamp
+      - name: quantity
+        type: float
+      - name: unit_concept_id
+        type: integer
+      - name: anatomic_site_concept_id
+        type: integer
+      - name: disease_status_concept_id
+        type: integer
+      - name: specimen_source_id
+        type: string
+      - name: specimen_source_value
+        type: string
+      - name: unit_source_value
+        type: string
+      - name: anatomic_site_source_value
+        type: string
+      - name: disease_status_source_value
+        type: string
+- name: death
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: death
+    schema:
+      fields:
+      - name: person_id
+        type: integer
+      - name: death_date
+        type: date
+      - name: death_datetime
+        type: timestamp
+      - name: death_type_concept_id
+        type: integer
+      - name: cause_concept_id
+        type: integer
+      - name: cause_source_value
+        type: string
+      - name: cause_source_concept_id
+        type: integer
+- name: visit_occurrence
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: visit_occurrence
+    schema:
+      fields:
+      - name: visit_occurrence_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: visit_concept_id
+        type: integer
+      - name: visit_start_date
+        type: date
+      - name: visit_start_datetime
+        type: timestamp
+      - name: visit_end_date
+        type: date
+      - name: visit_end_datetime
+        type: timestamp
+      - name: visit_type_concept_id
+        type: integer
+      - name: provider_id
+        type: integer
+      - name: care_site_id
+        type: integer
+      - name: visit_source_value
+        type: string
+      - name: visit_source_concept_id
+        type: integer
+      - name: admitting_source_concept_id
+        type: integer
+      - name: admitting_source_value
+        type: string
+      - name: discharge_to_concept_id
+        type: integer
+      - name: discharge_to_source_value
+        type: string
+      - name: preceding_visit_occurrence_id
+        type: integer
+- name: procedure_occurrence
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: procedure_occurrence
+    schema:
+      fields:
+      - name: procedure_occurrence_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: procedure_concept_id
+        type: integer
+      - name: procedure_date
+        type: date
+      - name: procedure_datetime
+        type: timestamp
+      - name: procedure_type_concept_id
+        type: integer
+      - name: modifier_concept_id
+        type: integer
+      - name: quantity
+        type: integer
+      - name: provider_id
+        type: integer
+      - name: visit_occurrence_id
+        type: integer
+      - name: procedure_source_value
+        type: string
+      - name: procedure_source_concept_id
+        type: integer
+      - name: qualifier_source_value
+        type: string
+- name: drug_exposure
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: drug_exposure
+    schema:
+      fields:
+      - name: drug_exposure_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: drug_concept_id
+        type: integer
+      - name: drug_exposure_start_date
+        type: date
+      - name: drug_exposure_start_datetime
+        type: timestamp
+      - name: drug_exposure_end_date
+        type: date
+      - name: drug_exposure_end_datetime
+        type: timestamp
+      - name: verbatim_end_date
+        type: date
+      - name: drug_type_concept_id
+        type: integer
+      - name: stop_reason
+        type: string
+      - name: refills
+        type: integer
+      - name: quantity
+        type: float
+      - name: days_supply
+        type: integer
+      - name: sig
+        type: string
+      - name: route_concept_id
+        type: integer
+      - name: lot_number
+        type: string
+      - name: provider_id
+        type: integer
+      - name: visit_occurrence_id
+        type: integer
+      - name: drug_source_value
+        type: string
+      - name: drug_source_concept_id
+        type: integer
+      - name: route_source_value
+        type: string
+      - name: dose_unit_source_value
+        type: string
+- name: device_exposure
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: device_exposure
+    schema:
+      fields:
+      - name: device_exposure_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: device_concept_id
+        type: integer
+      - name: device_exposure_start_date
+        type: date
+      - name: device_exposure_start_datetime
+        type: timestamp
+      - name: device_exposure_end_date
+        type: date
+      - name: device_exposure_end_datetime
+        type: timestamp
+      - name: device_type_concept_id
+        type: integer
+      - name: unique_device_id
+        type: string
+      - name: quantity
+        type: integer
+      - name: provider_id
+        type: integer
+      - name: visit_occurrence_id
+        type: integer
+      - name: device_source_value
+        type: string
+      - name: device_source_concept_id
+        type: integer
+- name: condition_occurrence
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: condition_occurrence
+    schema:
+      fields:
+      - name: condition_occurrence_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: condition_concept_id
+        type: integer
+      - name: condition_start_date
+        type: date
+      - name: condition_start_datetime
+        type: timestamp
+      - name: condition_end_date
+        type: date
+      - name: condition_end_datetime
+        type: timestamp
+      - name: condition_type_concept_id
+        type: integer
+      - name: stop_reason
+        type: string
+      - name: provider_id
+        type: integer
+      - name: visit_occurrence_id
+        type: integer
+      - name: condition_source_value
+        type: string
+      - name: condition_source_concept_id
+        type: integer
+      - name: condition_status_source_value
+        type: string
+      - name: condition_status_concept_id
+        type: integer
+- name: measurement
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: measurement
+    schema:
+      fields:
+      - name: measurement_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: measurement_concept_id
+        type: integer
+      - name: measurement_date
+        type: date
+      - name: measurement_datetime
+        type: timestamp
+      - name: measurement_type_concept_id
+        type: integer
+      - name: operator_concept_id
+        type: integer
+      - name: value_as_number
+        type: float
+      - name: value_as_concept_id
+        type: integer
+      - name: unit_concept_id
+        type: integer
+      - name: range_low
+        type: float
+      - name: range_high
+        type: float
+      - name: provider_id
+        type: integer
+      - name: visit_occurrence_id
+        type: integer
+      - name: measurement_source_value
+        type: string
+      - name: measurement_source_concept_id
+        type: integer
+      - name: unit_source_value
+        type: string
+      - name: value_source_value
+        type: string
+- name: note
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: note
+    schema:
+      fields:
+      - name: note_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: note_date
+        type: date
+      - name: note_datetime
+        type: timestamp
+      - name: note_type_concept_id
+        type: integer
+      - name: note_class_concept_id
+        type: integer
+      - name: note_title
+        type: string
+      - name: note_text
+        type: string
+      - name: encoding_concept_id
+        type: integer
+      - name: language_concept_id
+        type: integer
+      - name: provider_id
+        type: integer
+      - name: visit_occurrence_id
+        type: integer
+      - name: note_source_value
+        type: string
+- name: note_nlp
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: note_nlp
+    schema:
+      fields:
+      - name: note_nlp_id
+        type: integer
+      - name: note_id
+        type: integer
+      - name: section_concept_id
+        type: integer
+      - name: snippet
+        type: string
+      - name: "offset"
+        type: string
+      - name: lexical_variant
+        type: string
+      - name: note_nlp_concept_id
+        type: integer
+      - name: note_nlp_source_concept_id
+        type: integer
+      - name: nlp_system
+        type: string
+      - name: nlp_date
+        type: date
+      - name: nlp_datetime
+        type: timestamp
+      - name: term_exists
+        type: string
+      - name: term_temporal
+        type: string
+      - name: term_modifiers
+        type: string
+- name: observation
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: observation
+    schema:
+      fields:
+      - name: observation_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: observation_concept_id
+        type: integer
+      - name: observation_date
+        type: date
+      - name: observation_datetime
+        type: timestamp
+      - name: observation_type_concept_id
+        type: integer
+      - name: value_as_number
+        type: float
+      - name: value_as_string
+        type: string
+      - name: value_as_concept_id
+        type: integer
+      - name: qualifier_concept_id
+        type: integer
+      - name: unit_concept_id
+        type: integer
+      - name: provider_id
+        type: integer
+      - name: visit_occurrence_id
+        type: integer
+      - name: observation_source_value
+        type: string
+      - name: observation_source_concept_id
+        type: integer
+      - name: unit_source_value
+        type: string
+      - name: qualifier_source_value
+        type: string
+- name: fact_relationship
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: fact_relationship
+    schema:
+      fields:
+      - name: domain_concept_id_1
+        type: integer
+      - name: fact_id_1
+        type: integer
+      - name: domain_concept_id_2
+        type: integer
+      - name: fact_id_2
+        type: integer
+      - name: relationship_concept_id
+        type: integer
+- name: location
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: location
+    schema:
+      fields:
+      - name: location_id
+        type: integer
+      - name: address_1
+        type: string
+      - name: address_2
+        type: string
+      - name: city
+        type: string
+      - name: state
+        type: string
+      - name: zip
+        type: string
+      - name: county
+        type: string
+      - name: location_source_value
+        type: string
+- name: care_site
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: care_site
+    schema:
+      fields:
+      - name: care_site_id
+        type: integer
+      - name: care_site_name
+        type: string
+      - name: place_of_service_concept_id
+        type: integer
+      - name: location_id
+        type: integer
+      - name: care_site_source_value
+        type: string
+      - name: place_of_service_source_value
+        type: string
+- name: provider
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: provider
+    schema:
+      fields:
+      - name: provider_id
+        type: integer
+      - name: provider_name
+        type: string
+      - name: NPI
+        type: string
+      - name: DEA
+        type: string
+      - name: specialty_concept_id
+        type: integer
+      - name: care_site_id
+        type: integer
+      - name: year_of_birth
+        type: integer
+      - name: gender_concept_id
+        type: integer
+      - name: provider_source_value
+        type: string
+      - name: specialty_source_value
+        type: string
+      - name: specialty_source_concept_id
+        type: integer
+      - name: gender_source_value
+        type: string
+      - name: gender_source_concept_id
+        type: integer
+- name: payer_plan_period
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: payer_plan_period
+    schema:
+      fields:
+      - name: payer_plan_period_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: payer_plan_period_start_date
+        type: date
+      - name: payer_plan_period_end_date
+        type: date
+      - name: payer_source_value
+        type: string
+      - name: plan_source_value
+        type: string
+      - name: family_source_value
+        type: string
+- name: cost
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: cost
+    schema:
+      fields:
+      - name: cost_id
+        type: integer
+      - name: cost_event_id
+        type: integer
+      - name: cost_domain_id
+        type: string
+      - name: cost_type_concept_id
+        type: integer
+      - name: currency_concept_id
+        type: integer
+      - name: total_charge
+        type: float
+      - name: total_cost
+        type: float
+      - name: total_paid
+        type: float
+      - name: paid_by_payer
+        type: float
+      - name: paid_by_patient
+        type: float
+      - name: paid_patient_copay
+        type: float
+      - name: paid_patient_coinsurance
+        type: float
+      - name: paid_patient_deductible
+        type: float
+      - name: paid_by_primary
+        type: float
+      - name: paid_ingredient_cost
+        type: float
+      - name: paid_dispensing_fee
+        type: float
+      - name: payer_plan_period_id
+        type: integer
+      - name: amount_allowed
+        type: float
+      - name: revenue_code_concept_id
+        type: integer
+      - name: reveue_code_source_value
+        type: string
+      - name: drg_concept_id
+        type: integer
+      - name: drg_source_value
+        type: string
+- name: cohort
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: cohort
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: subject_id
+        type: integer
+      - name: cohort_start_date
+        type: date
+      - name: cohort_end_date
+        type: date
+- name: cohort_attribute
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: cohort_attribute
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: cohort_start_date
+        type: date
+      - name: cohort_end_date
+        type: date
+      - name: subject_id
+        type: integer
+      - name: attribute_definition_id
+        type: integer
+      - name: value_as_number
+        type: float
+      - name: value_as_concept_id
+        type: integer
+- name: drug_era
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: drug_era
+    schema:
+      fields:
+      - name: drug_era_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: drug_concept_id
+        type: integer
+      - name: drug_era_start_date
+        type: date
+      - name: drug_era_end_date
+        type: date
+      - name: drug_exposure_count
+        type: integer
+      - name: gap_days
+        type: integer
+- name: dose_era
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: dose_era
+    schema:
+      fields:
+      - name: dose_era_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: drug_concept_id
+        type: integer
+      - name: unit_concept_id
+        type: integer
+      - name: dose_value
+        type: float
+      - name: dose_era_start_date
+        type: date
+      - name: dose_era_end_date
+        type: date
+- name: condition_era
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: condition_era
+    schema:
+      fields:
+      - name: condition_era_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: condition_concept_id
+        type: integer
+      - name: condition_era_start_date
+        type: date
+      - name: condition_era_end_date
+        type: date
+      - name: condition_occurrence_count
+        type: integer

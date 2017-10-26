@@ -20,6 +20,9 @@ info:
 required:
   - zone
   - region
+  - tempDataset
+  - cdmDataset
+  - ohdsiDataset
 
 properties:
   zone:
@@ -27,4 +30,13 @@ properties:
     type: string
   region:
     description: Region in which the addresses are allocated
+    type: string
+  tempDataset:
+    description: BigQuery dataset for storing temp tables
+    type: string
+  cdmDataset:
+    description: BigQuery dataset for storing the CDM schema
+    type: string
+  ohdsiDataset:
+    description: BigQuery dataset for storing the OHDSI schema
     type: string

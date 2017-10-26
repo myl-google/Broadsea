@@ -30,10 +30,12 @@ gcloud deployment-manager deployments delete broadsea-deployment
 systemctl (on cos vm)
 journalctl (on cos vm)
 
-permission postgres to the vm ip address - verify that you can connect with the default password without having to set it
+instructions for regenerating the bigquery deployment
+python create_bigquery_deployment.py -d cdmDataset -s cdm.sql  >> deployment_manager/cos.jinja
 
 dump the table schemas and convert them to deployment manager
 create the tables in the datasets (will need to keep the schema up to date)
+
 
 see if starschema can already fetch from default credentials with the right arguments (seems like it can be done with minor code changes)
 confirm credentials are in the vm
