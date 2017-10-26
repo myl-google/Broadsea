@@ -28,7 +28,6 @@ gcloud deployment-manager deployments create broadsea-deployment --config broads
 gcloud deployment-manager deployments delete broadsea-deployment 
 
 permission postgres to the vm ip address - verify that you can connect with the default password without having to set it
-(gke may be tricky to use a non-ephemeral address, cos requires using cloud init)
 
 dump the table schemas and convert them to deployment manager
 create the tables in the datasets (will need to keep the schema up to date)
@@ -43,6 +42,10 @@ populate source table in postgres on startup
 set the correct postgres ip in the environment variable in the vm
 get the bigquery driver into the container - may need to build your own image to make this work; could also check it into the webapi install; could also check it alongside the main broadsea dockerfile
 build the broadsea images and host them on gcr (faster and you can also test them)
+
+deferred
+- move to gke (would handle auto updates, would need to figure out how to set non-ephemeral address for nodes, would add some complication to connecting)
+- use shiro for auth
 
 ### Alternative 
 

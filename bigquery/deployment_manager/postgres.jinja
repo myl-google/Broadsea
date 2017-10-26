@@ -11,10 +11,8 @@ resources:
         tier: db-custom-1-3840
         ipConfiguration:
           authorizedNetworks:
-          - name: broadsea-methods-vm
+          - name: broadsea-vm
             value: $(ref.{{ BASE_NAME }}-methods-vm.networkInterfaces[0].accessConfigs[0].natIP)
-          - name: broadsea-webtools-vm
-            value: $(ref.{{ BASE_NAME }}-webtools-vm.networkInterfaces[0].accessConfigs[0].natIP)
   - name: {{BASE_NAME}}-postgres-user
     type: sqladmin.v1beta4.user
     metadata:
