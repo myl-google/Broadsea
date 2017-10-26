@@ -1,0 +1,26 @@
+{% set BASE_NAME = env['deployment'] %}
+
+resources:
+  - name: {{BASE_NAME}}-postgres-instance
+    type: sqladmin.v1beta4.instance
+    properties:
+      name: {{BASE_NAME}}-postgres
+      databaseVersion: POSTGRES_9_6
+      gceZone: {{ properties['zone'] }}
+      settings:
+        tier: db-custom-1-3840
+        ipConfiguration:
+          authorizedNetworks:
+          - name: broadsea-methods-vm
+            value: $(ref.{{ BASE_NAME }}-methods-vm.networkInterfaces[0].accessConfigs[0].natIP)
+          - name: broadsea-webtools-vm
+            value: $(ref.{{ BASE_NAME }}-webtools-vm.networkInterfaces[0].accessConfigs[0].natIP)
+  - name: {{BASE_NAME}}-postgres-user
+    type: sqladmin.v1beta4.user
+    metadata:
+      dependsOn:
+      - {{BASE_NAME}}-postgres-instance
+    properties:
+      instance: {{BASE_NAME}}-postgres
+      name: postgres
+      password: ohdsi

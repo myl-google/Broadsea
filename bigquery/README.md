@@ -27,9 +27,12 @@ gcloud deployment-manager deployments describe broadsea-deployment
 gcloud deployment-manager deployments create broadsea-deployment --config broadsea_deployment.yaml
 gcloud deployment-manager deployments delete broadsea-deployment 
 
-permission postgres to the vm ip address
-switch to cos
-run both broadsea containers in one vm (may need to change to kubernetes or cos)
+permission postgres to the vm ip address - verify that you can connect with the default password without having to set it
+switch to cos or kubernetes and run both broadsea containers in one vm 
+(gke may be tricky to use a non-ephemeral address, cos requires using cloud init)
+
+cos requires using cloud init
+cos requires finding the right image
 
 dump the table schemas and convert them to deployment manager
 create the tables in the datasets (will need to keep the schema up to date)

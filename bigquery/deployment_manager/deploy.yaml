@@ -18,19 +18,30 @@ imports:
 - path: broadsea_webtools_manifest.yaml
   name: broadsea_webtools_manifest
 - path: container_vm.jinja
+- path: cos.jinja
+- path: postgres.jinja
 
 resources:
-  - name: methods-vm
-    type: container_vm.jinja
+#  - name: methods-vm
+#    type: container_vm.jinja
+#    properties:
+#      zone: us-central1-a
+#      region: us-central1
+#      containerImage: family/container-vm
+#      containerManifest: broadsea_methods_manifest
+#  - name: webtools-vm
+#    type: container_vm.jinja
+#    properties:
+#      zone: us-central1-a
+#      region: us-central1
+#      containerImage: family/container-vm
+#      containerManifest: broadsea_webtools_manifest
+  - name: combined-vm
+    type: cos.jinja
     properties:
       zone: us-central1-a
       region: us-central1
-      containerImage: family/container-vm
-      containerManifest: broadsea_methods_manifest
-  - name: webtools-vm
-    type: container_vm.jinja
-    properties:
-      zone: us-central1-a
-      region: us-central1
-      containerImage: family/container-vm
-      containerManifest: broadsea_webtools_manifest
+#  - name: postgres
+#    type: postgres.jinja
+#    properties:
+#      zone: us-central1-a

@@ -20,8 +20,6 @@ info:
 required:
   - zone
   - region
-  - containerImage
-  - containerManifest
 
 properties:
   zone:
@@ -29,10 +27,4 @@ properties:
     type: string
   region:
     description: Region in which the addresses are allocated
-    type: string
-  containerImage:
-    description: Name of the Google Cloud Container VM Image
-    type: string
-  containerManifest:
-    description: String containing the Container Manifest in YAML
     type: string
