@@ -22,10 +22,13 @@ cd Broadsea/bigquery
 
 ### Deployment manager
 
+Useful commands
 gcloud compute instances describe broadsea-deployment-broadsea-vm
 gcloud deployment-manager deployments describe broadsea-deployment
 gcloud deployment-manager deployments create broadsea-deployment --config broadsea_deployment.yaml
 gcloud deployment-manager deployments delete broadsea-deployment 
+systemctl (on cos vm)
+journalctl (on cos vm)
 
 permission postgres to the vm ip address - verify that you can connect with the default password without having to set it
 
