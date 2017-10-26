@@ -1165,7 +1165,7 @@ resources:
         type: integer
       - name: drg_source_value
         type: string
-- name: cohort
+- name: cdm_cohort
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1282,3 +1282,383 @@ resources:
         type: date
       - name: condition_occurrence_count
         type: integer
+- name: cohort
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: cohort
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: subject_id
+        type: integer
+      - name: cohort_start_date
+        type: date
+      - name: cohort_end_date
+        type: date
+- name: cohort_inclusion
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: cohort_inclusion
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: rule_sequence
+        type: integer
+      - name: name
+        type: string
+      - name: description
+        type: string
+- name: cohort_inclusion_result
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: cohort_inclusion_result
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: inclusion_rule_mask
+        type: integer
+      - name: person_count
+        type: integer
+- name: cohort_inclusion_stats
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: cohort_inclusion_stats
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: rule_sequence
+        type: integer
+      - name: person_count
+        type: integer
+      - name: gain_count
+        type: integer
+      - name: person_total
+        type: integer
+- name: cohort_summary_stats
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: cohort_summary_stats
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: base_count
+        type: integer
+      - name: final_count
+        type: integer
+- name: feas_study_inclusion_stats
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: feas_study_inclusion_stats
+    schema:
+      fields:
+      - name: study_id
+        type: integer
+      - name: rule_sequence
+        type: integer
+      - name: name
+        type: string
+      - name: person_count
+        type: integer
+      - name: gain_count
+        type: integer
+      - name: person_total
+        type: integer
+- name: feas_study_index_stats
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: feas_study_index_stats
+    schema:
+      fields:
+      - name: study_id
+        type: integer
+      - name: person_count
+        type: integer
+      - name: match_count
+        type: integer
+- name: feas_study_result
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: feas_study_result
+    schema:
+      fields:
+      - name: study_id
+        type: integer
+      - name: inclusion_rule_mask
+        type: integer
+      - name: person_count
+        type: integer
+- name: heracles_analysis
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: heracles_analysis
+    schema:
+      fields:
+      - name: analysis_id
+        type: integer
+      - name: analysis_name
+        type: string
+      - name: stratum_1_name
+        type: string
+      - name: stratum_2_name
+        type: string
+      - name: stratum_3_name
+        type: string
+      - name: stratum_4_name
+        type: string
+      - name: stratum_5_name
+        type: string
+      - name: analysis_type
+        type: string
+- name: heracles_heel_results
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: heracles_heel_results
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: analysis_id
+        type: integer
+      - name: heracles_heel_warning
+        type: string
+- name: heracles_results
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: heracles_results
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: analysis_id
+        type: integer
+      - name: stratum_1
+        type: string
+      - name: stratum_2
+        type: string
+      - name: stratum_3
+        type: string
+      - name: stratum_4
+        type: string
+      - name: stratum_5
+        type: string
+      - name: count_value
+        type: integer
+      - name: last_update_time
+        type: timestamp
+- name: heracles_results_dist
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: heracles_results_dist
+    schema:
+      fields:
+      - name: cohort_definition_id
+        type: integer
+      - name: analysis_id
+        type: integer
+      - name: stratum_1
+        type: string
+      - name: stratum_2
+        type: string
+      - name: stratum_3
+        type: string
+      - name: stratum_4
+        type: string
+      - name: stratum_5
+        type: string
+      - name: count_value
+        type: integer
+      - name: min_value
+        type: float
+      - name: max_value
+        type: float
+      - name: avg_value
+        type: float
+      - name: stdev_value
+        type: float
+      - name: median_value
+        type: float
+      - name: p10_value
+        type: float
+      - name: p25_value
+        type: float
+      - name: p75_value
+        type: float
+      - name: p90_value
+        type: float
+      - name: last_update_time
+        type: timestamp
+- name: ir_analysis_dist
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: ir_analysis_dist
+    schema:
+      fields:
+      - name: analysis_id
+        type: integer
+      - name: target_id
+        type: integer
+      - name: outcome_id
+        type: integer
+      - name: strata_sequence
+        type: integer
+      - name: dist_type
+        type: integer
+      - name: total
+        type: integer
+      - name: avg_value
+        type: float
+      - name: std_dev
+        type: float
+      - name: min_value
+        type: integer
+      - name: p10_value
+        type: integer
+      - name: p25_value
+        type: integer
+      - name: median_value
+        type: integer
+      - name: p75_value
+        type: integer
+      - name: p90_value
+        type: integer
+      - name: max_value
+        type: integer
+- name: ir_analysis_result
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: ir_analysis_result
+    schema:
+      fields:
+      - name: analysis_id
+        type: integer
+      - name: target_id
+        type: integer
+      - name: outcome_id
+        type: integer
+      - name: strata_mask
+        type: integer
+      - name: person_count
+        type: integer
+      - name: time_at_risk
+        type: integer
+      - name: cases
+        type: integer
+- name: ir_analysis_strata_stats
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: ir_analysis_strata_stats
+    schema:
+      fields:
+      - name: analysis_id
+        type: integer
+      - name: target_id
+        type: integer
+      - name: outcome_id
+        type: integer
+      - name: strata_sequence
+        type: integer
+      - name: person_count
+        type: integer
+      - name: time_at_risk
+        type: integer
+      - name: cases
+        type: integer
+- name: ir_strata
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - ohdsiDatasetResource
+  properties:
+    datasetId: {{ properties['ohdsiDataset'] }}
+    tableReference:
+      tableId: ir_strata
+    schema:
+      fields:
+      - name: analysis_id
+        type: integer
+      - name: strata_sequence
+        type: integer
+      - name: name
+        type: string
+      - name: description
+        type: string

@@ -31,22 +31,33 @@ systemctl (on cos vm)
 journalctl (on cos vm)
 
 instructions for regenerating the bigquery deployment
+# edit deployment_manager/cos.jina and remove all the biguery tables at the end
+wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
+#ren to cdm.sql
 python create_bigquery_deployment.py -d cdmDataset -s cdm.sql  >> deployment_manager/cos.jinja
-
-dump the table schemas and convert them to deployment manager
-create the tables in the datasets (will need to keep the schema up to date)
-
+#cloud_sql_proxy --instances=ohdsi-in-a-box:us-central1:broadsea-deployment29-postgres=tcp:5432
+On the vm:
+docker exec -i -t <container_id> /bin/bash
+apt-get update
+apt-get install postgres-client
+pg_dump "host=<host_ip> dbname=postgres user=postgres password=ohdsi" > /ohdsi.sql
+exit
+docker cp <container_id>:/ohdsi.sql .
+On your workstation:
+gcloud beta compute scp --project ohdsi-in-a-box --zone us-central1-a broadsea-deployment28-vm:/home/myl/ohdsi.sql .
+python create_bigquery_deployment.py -d ohdsiDataset -s ohdsi.sql -w results_tables_whitelist.txt >> deployment_manager/cos.jinja
 
 see if starschema can already fetch from default credentials with the right arguments (seems like it can be done with minor code changes)
 confirm credentials are in the vm
 confirm credentials are in the container
-figure out if bigquery can authorize from the vm and from the container (make code changes to starschema if necessary)
 try to add a secret to the broadsea_manifest (or figure out how to authorize in the container)
 
 populate source table in postgres on startup
-set the correct postgres ip in the environment variable in the vm
+build the broadsea images and host them on gcr (faster and you can also test them and lock the version)
 get the bigquery driver into the container - may need to build your own image to make this work; could also check it into the webapi install; could also check it alongside the main broadsea dockerfile
-build the broadsea images and host them on gcr (faster and you can also test them)
+create a separate user or figure out the default password for the postgres user
+separate the bigquery deployment into a separate jinja file so you can potentially change it separately
+test deployment with cdm in a separate project
 
 deferred
 - move to gke (would handle auto updates, would need to figure out how to set non-ephemeral address for nodes, would add some complication to connecting)

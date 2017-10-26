@@ -31,7 +31,7 @@ except getopt.GetoptError:
 
 sql_commands = open(sql).readlines()
 
-TABLE_TEMPLATE = """- name: %s
+TABLE_TEMPLATE = """- name: %s_%s
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -49,7 +49,7 @@ for line in sql_commands:
     words = line.split()
     if table_name:
         if words[0] == ");" or words[0] == ")" or words[0] ==";":
-	  print TABLE_TEMPLATE % (table_name, dataset, dataset, table_name)
+	  print TABLE_TEMPLATE % (dataset, table_name, dataset, dataset, table_name)
           print "\n".join(table_columns)
           table_name = None
           table_columns = []
