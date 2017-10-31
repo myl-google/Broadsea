@@ -36,6 +36,10 @@ resources:
   properties:
     zone: {{ properties['zone'] }}
     machineType: {{ ZonalComputeUrl(env['project'], properties['zone'], 'machineTypes', 'n1-standard-1') }}
+    serviceAccounts:
+      - email: {{ env['project_number'] }}-compute@developer.gserviceaccount.com
+        scopes:
+        - https://www.googleapis.com/auth/cloud-platform
     metadata:
       items:
         - key: user-data
@@ -71,8 +75,8 @@ resources:
                   --env=DATASOURCE_URL=jdbc:postgresql://$(ref.{{BASE_NAME}}-postgres-instance.ipAddresses[0].ipAddress):5432/postgres \
                   --env=DATASOURCE_CDM_SCHEMA=cdm \
                   --env=DATASOURCE_OHDSI_SCHEMA=ohdsi \
-                  --env=DATASOURCE_USERNAME=postgres \
-                  --env=DATASOURCE_PASSWORD=ohdsi \
+                  --env=DATASOURCE_USERNAME=ohdsi-postgres-user \
+                  --env=DATASOURCE_PASSWORD=ohdsi-postgres-password \
                   --env=SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA=ohdsi \
                   --env=SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect \
                   --env=SPRING_BATCH_REPOSITORY_TABLEPREFIX=ohdsi.BATCH_ \
@@ -80,18 +84,68 @@ resources:
                   --env=FLYWAY_DATASOURCE_URL=jdbc:postgresql://$(ref.{{ BASE_NAME }}-postgres-instance.ipAddresses[0].ipAddress):5432/postgres \
                   --env=FLYWAY_SCHEMAS=ohdsi \
                   --env=FLYWAY_PLACEHOLDERS_OHDSISCHEMA=ohdsi \
-                  --env=FLYWAY_DATASOURCE_USERNAME=postgres \
-                  --env=FLYWAY_DATASOURCE_PASSWORD=ohdsi \
+                  --env=FLYWAY_DATASOURCE_USERNAME=ohdsi-postgres-user \
+                  --env=FLYWAY_DATASOURCE_PASSWORD=ohdsi-postgres-password \
                   --env=FLYWAY_LOCATIONS=classpath:db/migration/postgresql \
                   gcr.io/ohdsi-in-a-box/broadsea-webtools-bigquery
                 ExecStop=/usr/bin/docker stop broadsea-webtools
                 ExecStopPost=/usr/bin/docker rm broadsea-webtools
                 Restart=on-failure
-            
+
+            - path: /tmp/source_source_daimon.sql
+              permissions: 0666
+              owner: root
+              content: |
+                -- remove any previously added database connection configuration data
+                truncate ohdsi.source;
+                truncate ohdsi.source_daimon;
+                
+                -- OHDSI CDM source
+                INSERT INTO ohdsi.source(source_id, source_name, source_key, source_connection, source_dialect)
+                VALUES (1, 'OHDSI CDM V5 Database', 'OHDSI-CDMV5', 'jdbc:BQDriver:{{ env['project'] }}', 'bigquery');
+                
+                -- CDM daimon
+                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (1, 1, 0, '{{ properties['cdmDataset'] }}', 2);
+                
+                -- VOCABULARY daimon
+                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (2, 1, 1, '{{ properties['cdmDataset'] }}', 2);
+                
+                -- RESULTS daimon
+                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (3, 1, 2, '{{ properties['ohdsiDataset']}}', 2);
+                
+                -- EVIDENCE daimon
+                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (4, 1, 3, '{{ properties['ohdsiDataset'] }}', 2);
+
+            - path: /tmp/update_source.sh
+              permissions: 0555
+              owner: root
+              content: |
+                # Waits for the the source table to appear in the postgres schema and then populates it and restarts the docker container 
+                export WEBTOOLS_ID=`docker ps -aqf "name=broadsea-webtools"`
+                export HOST=$(ref.{{ BASE_NAME }}-postgres-instance.ipAddresses[0].ipAddress)
+                while [ ! -s /tmp/query_result.txt ]; do
+                  docker exec -i -t $WEBTOOLS_ID /usr/bin/psql "host=$HOST dbname=postgres user=ohdsi-postgres-user password=ohdsi-postgres-password" -A -t \
+                    -c "SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema='ohdsi' AND table_name='source';" \
+                    > /tmp/query_result.txt
+                  sleep 10
+                done
+                docker cp /tmp/source_source_daimon.sql $WEBTOOLS_ID:/tmp/
+                docker exec -i -t $WEBTOOLS_ID /usr/bin/psql "host=$HOST dbname=postgres user=ohdsi-postgres-user password=ohdsi-postgres-password" -f /tmp/source_source_daimon.sql
+                docker restart $WEBTOOLS_ID
+
+            - path: /tmp/tail_weblog.sh
+              permissions: 0555
+              owner: root
+              content: |
+                export WEBTOOLS_ID=`docker ps -aqf "name=broadsea-webtools"`
+                export ERRLOG=`docker exec $WEBTOOLS_ID /usr/bin/find /var/log/supervisor | grep stderr`
+                docker exec -i -t $WEBTOOLS_ID tail -f $ERRLOG
+
             runcmd:
             - systemctl daemon-reload
             - systemctl start broadsea-methods.service
             - systemctl start broadsea-webtools.service
+            - /tmp/update_source.sh
 
     disks:
       - deviceName: boot
@@ -121,13 +175,11 @@ resources:
           value: $(ref.{{ BASE_NAME }}-address.address)
 - name: {{BASE_NAME}}-postgres-user
   type: sqladmin.v1beta4.user
-  metadata:
-    dependsOn:
-    - {{BASE_NAME}}-postgres-instance
   properties:
-    instance: {{BASE_NAME}}-postgres
-    name: postgres
-    password: ohdsi
+    instance: $(ref.{{BASE_NAME}}-postgres-instance.name)
+    host: "%"
+    name: ohdsi-postgres-user
+    password: ohdsi-postgres-password
 - name: tempDatasetResource
   type: bigquery.v2.dataset
   properties:

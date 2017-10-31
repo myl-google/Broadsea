@@ -1,19 +1,21 @@
 # Deployment manager instructions for Broadsea on GCP
 
 ## TODO
-populate source table in postgres on startup (install postgres client tools in the dockerfile)
-create a separate user or figure out the default password for the postgres user
-separate the generated part of the bigquery deployment into a different jinja file so you can potentially change it separately
+fix problem with user blocking deletion
+populate source table in postgres on first startup (wait for the server to create the tables by polling, then execute script)
 add a script on the methods image to run achilles
 clean up unused scripts and directory structure
 test the deployment on the synpuf data and make sure all the visualizations are working (update source to point at the data in ohdsi-in-a-box)
 test deployment with cdm in a separate project (need to permission the compute engine service account to access the bigquery datasets)
+push broadsea changes to origin
 
 ## deferred
 - get preinstall of R packages to work properly (not just put it in a temporary session?)
 - restrict access to gcr.io images
 - move to gke (would handle auto updates, would need to figure out how to set non-ephemeral address for nodes, would add some complication to connecting)
 - use shiro for auth
+- move scripts to a dedicated script directory rather than /tmp
+- serve the stderr weblog on a port in the vm (maybe an apache config)
 
 ## instructions for regenerating the bigquery deployment to pick up schema updates
 # edit deployment_manager/cos.jina and remove all the biguery tables at the end
@@ -36,6 +38,7 @@ python create_bigquery_deployment.py -d ohdsiDataset -s ohdsi.sql -w results_tab
 build-upload.sh
 
 ## Useful commands
+gcloud compute ssh $VM_NAME --project $PROJECT --zone $VM_ZONE --ssh-flag="-L" --ssh-flag="8080:localhost:8080" --ssh-flag="-L" --ssh-flag="8787:localhost:8787"
 gcloud compute instances describe broadsea-deployment-broadsea-vm
 gcloud deployment-manager deployments describe broadsea-deployment
 gcloud deployment-manager deployments create broadsea-deployment --config broadsea_deployment.yaml

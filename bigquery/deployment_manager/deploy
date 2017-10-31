@@ -1,4 +1,4 @@
-gcloud deployment-manager deployments delete broadsea-deployment29 -q 
-gcloud deployment-manager deployments create broadsea-deployment30 --config deploy.yaml
+gcloud deployment-manager deployments delete broadsea-deployment38 -q 
+gcloud deployment-manager deployments create broadsea-deployment39 --config deploy.yaml
 
 #gcloud deployment-manager deployments update broadsea-deployment2 --config deploy.yaml
