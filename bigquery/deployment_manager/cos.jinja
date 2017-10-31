@@ -51,7 +51,7 @@ resources:
                 Description=Start the broadsea methods docker container
             
                 [Service]
-                ExecStart=/usr/bin/docker run --rm -u 0 -p 8787:8787 -p 6111:6111 --name=broadsea-methodslibrary ohdsi/broadsea-methodslibrary
+                ExecStart=/usr/bin/docker run --rm -u 0 -p 8787:8787 -p 6111:6111 --name=broadsea-methodslibrary gcr.io/ohdsi-in-a-box/broadsea-methods-bigquery
                 ExecStop=/usr/bin/docker stop broadsea-methodslibrary
                 ExecStopPost=/usr/bin/docker rm broadsea-methodslibrary
                 Restart=on-failure
@@ -83,7 +83,7 @@ resources:
                   --env=FLYWAY_DATASOURCE_USERNAME=postgres \
                   --env=FLYWAY_DATASOURCE_PASSWORD=ohdsi \
                   --env=FLYWAY_LOCATIONS=classpath:db/migration/postgresql \
-                  ohdsi/broadsea-webtools
+                  gcr.io/ohdsi-in-a-box/broadsea-webtools-bigquery
                 ExecStop=/usr/bin/docker stop broadsea-webtools
                 ExecStopPost=/usr/bin/docker rm broadsea-webtools
                 Restart=on-failure

@@ -1,4 +1,116 @@
-# Additional Notes for Running with BigQuery
+# Deployment manager instructions for Broadsea on GCP
+
+## TODO
+populate source table in postgres on startup (install postgres client tools in the dockerfile)
+create a separate user or figure out the default password for the postgres user
+separate the generated part of the bigquery deployment into a different jinja file so you can potentially change it separately
+add a script on the methods image to run achilles
+clean up unused scripts and directory structure
+test the deployment on the synpuf data and make sure all the visualizations are working (update source to point at the data in ohdsi-in-a-box)
+test deployment with cdm in a separate project (need to permission the compute engine service account to access the bigquery datasets)
+
+## deferred
+- get preinstall of R packages to work properly (not just put it in a temporary session?)
+- restrict access to gcr.io images
+- move to gke (would handle auto updates, would need to figure out how to set non-ephemeral address for nodes, would add some complication to connecting)
+- use shiro for auth
+
+## instructions for regenerating the bigquery deployment to pick up schema updates
+# edit deployment_manager/cos.jina and remove all the biguery tables at the end
+wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
+#ren to cdm.sql
+python create_bigquery_deployment.py -d cdmDataset -s cdm.sql  >> deployment_manager/cos.jinja
+#cloud_sql_proxy --instances=ohdsi-in-a-box:us-central1:broadsea-deployment29-postgres=tcp:5432
+On the vm:
+docker exec -i -t <container_id> /bin/bash
+apt-get update
+apt-get install postgres-client
+pg_dump "host=<host_ip> dbname=postgres user=postgres password=ohdsi" > /ohdsi.sql
+exit
+docker cp <container_id>:/ohdsi.sql .
+On your workstation:
+gcloud beta compute scp --project ohdsi-in-a-box --zone us-central1-a broadsea-deployment28-vm:/home/myl/ohdsi.sql .
+python create_bigquery_deployment.py -d ohdsiDataset -s ohdsi.sql -w results_tables_whitelist.txt >> deployment_manager/cos.jinja
+
+## instructions for rebuilding the webtools and methods images:
+build-upload.sh
+
+## Useful commands
+gcloud compute instances describe broadsea-deployment-broadsea-vm
+gcloud deployment-manager deployments describe broadsea-deployment
+gcloud deployment-manager deployments create broadsea-deployment --config broadsea_deployment.yaml
+gcloud deployment-manager deployments delete broadsea-deployment 
+systemctl (on cos vm)
+journalctl (on cos vm)
+
+# Alternative instructions (TODO)
+
+## ip addresses
+- create two external ip addresses in cloud shell
+```bash
+export PROJECT_ID=`gcloud config get-value project`
+gcloud config set project ${PROJECT_ID?}
+export PROJECT_NUMBER=`gcloud projects list --format 'value(PROJECT_NUMBER)' --filter PROJECT_ID=$PROJECT`
+export REGION=us-central1
+export ZONE=us-central1-a
+gcloud config set compute/zone ${ZONE?}
+
+## Create service account key
+gcloud iam service-accounts keys create ohdsi-bigquery.p12 --iam-account ${PROJECT_NUMBER?}-compute@developer.gserviceaccount.com --key-file-type=p12
+gsutil mb -c regional -l ${REGION?} gs://bigquery-key-${PROJECT_NUMBER?}
+gsutil cp ohdsi-bigquery.p12 gs://bigquery-key-${PROJECT_NUMBER?}/
+rm ohdsi-bigquery.p12
+
+## Create cloud sql postgres instance
+TODO
+
+# Create gke cluster 
+gcloud components install kubectl
+gcloud container clusters create broadsea-cluster --num-nodes=1
+# Can't be used in combination with --num-nodes=1 --machine-type=f1-micro
+gcloud alpha container clusters create broadsea-cluster --enable-kubernetes-alpha # until 1.8 is available
+
+## Deploy both containers
+kubectl create secret generic ohdsi-bigquery --from-file=./ohdsi-bigquery.p12 # https://kubernetes.io/docs/concepts/configuration/secret/
+# TODO - create a yaml file
+# (cancelled) build a local image with the p12 file included and upload to gcr (need to enable gcr with glcoud service-management enable ... ...)
+# (cancelled) create a gcePersistentDisk 
+# (cancelled) copy the p12 file using a gcs command run as part of starting the container (need to ensure gsutil is installed, also need to authenticate from inside the container) - could use a kubectl cp before running anything and on any restart
+# TODO - set environment variables with jdbc urls, passwords, etc. using --env="var=value" on the run command or in the yaml file
+kubectl run broadsea-methods --image=ohdsi/broadsea-methodslibrary --port=8787
+kubectl create -f broadsea
+# Use a multi-container pod https://lukemarsden.github.io/docs/user-guide/pods/multi-container/
+
+## Port forwarding
+gcloud --project ${PROJECT_ID?} --zone=${ZONE?} container clusters get-credentials broadsea-cluster
+export METHODS_PODNAME=`kubectl get pods -o jsonpath={.items..metadata.name} --selector=run=broadsea-methods`
+kubectl port-forward ${METHODS_PODNAME?} 8787:8787
+
+## Shell to containers
+kubectl exec broadsea-methods-1737533209-ngb7l -i -t -- bash
+kubectl exec broadsea-webtools-3776678029-hpnwj -t -i -- more /var/log/supervisor/deploy-script-stderr---supervisor-jii9ye.log
+
+## Old
+gcloud compute addresses create broadsea-methods-ip --region ${REGION?}
+export BROADSEA_METHODS_IP=`gcloud compute addresses describe broadsea-methods-ip --region ${REGION?} --format 'value(address)'`
+gcloud compute addresses create broadsea-webtools-ip --region ${REGION?}
+export BROADSEA_WEBTOOLS_IP=`gcloud compute addresses describe broadsea-webtools-ip --region ${REGION?} --format 'value(address)'`
+gcloud compute --project "${PROJECT?}" instances create "broadsea-methods-vm" \
+--zone "${REGION?}-a" \
+--machine-type "n1-standard-1" \
+--subnet "default" \
+--address ${BROADSEA_METHODS_IP?} \
+--metadata "gce-container-declaration=spec:\u000a  containers:\u000a    - name: broadsea-methods-vm\u000a      image: ohdsi/broadsea-methodslibrary\u000a      volumeMounts:\u000a        - name: host-path-1\u000a          mountPath: /tmp/drivers\u000a          readOnly: true\u000a      stdin: false\u000a      tty: false\u000a  restartPolicy: Always\u000a  volumes:\u000a    - name: host-path-1\u000a      hostPath:\u000a        path: /tmp/drivers\u000a" \
+--maintenance-policy "MIGRATE" \
+--service-account "${PROJECT_NUMBER?}-compute@developer.gserviceaccount.com" \
+--scopes "https://www.googleapis.com/auth/cloud-platform" \
+--image "cos-beta-62-9901-37-0" \
+--image-project "cos-cloud" \
+--boot-disk-size "10" \
+--boot-disk-type "pd-standard" \
+--boot-disk-device-name "broadsea-methods-vm"
+
+# Manual setup instructions for Broadsea on GCP
 
 ## Creating a VM to run BroadSea
 
@@ -19,121 +131,6 @@ sudo apt-get install git
 git clone https://github.com/myl-google/Broadsea.git
 cd Broadsea/bigquery
 ```
-
-### Deployment manager
-
-Useful commands
-gcloud compute instances describe broadsea-deployment-broadsea-vm
-gcloud deployment-manager deployments describe broadsea-deployment
-gcloud deployment-manager deployments create broadsea-deployment --config broadsea_deployment.yaml
-gcloud deployment-manager deployments delete broadsea-deployment 
-systemctl (on cos vm)
-journalctl (on cos vm)
-
-instructions for regenerating the bigquery deployment
-# edit deployment_manager/cos.jina and remove all the biguery tables at the end
-wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
-#ren to cdm.sql
-python create_bigquery_deployment.py -d cdmDataset -s cdm.sql  >> deployment_manager/cos.jinja
-#cloud_sql_proxy --instances=ohdsi-in-a-box:us-central1:broadsea-deployment29-postgres=tcp:5432
-On the vm:
-docker exec -i -t <container_id> /bin/bash
-apt-get update
-apt-get install postgres-client
-pg_dump "host=<host_ip> dbname=postgres user=postgres password=ohdsi" > /ohdsi.sql
-exit
-docker cp <container_id>:/ohdsi.sql .
-On your workstation:
-gcloud beta compute scp --project ohdsi-in-a-box --zone us-central1-a broadsea-deployment28-vm:/home/myl/ohdsi.sql .
-python create_bigquery_deployment.py -d ohdsiDataset -s ohdsi.sql -w results_tables_whitelist.txt >> deployment_manager/cos.jinja
-
-see if starschema can already fetch from default credentials with the right arguments (seems like it can be done with minor code changes)
-confirm credentials are in the vm
-confirm credentials are in the container
-try to add a secret to the broadsea_manifest (or figure out how to authorize in the container)
-
-populate source table in postgres on startup
-build the broadsea images and host them on gcr (faster and you can also test them and lock the version)
-get the bigquery driver into the container - may need to build your own image to make this work; could also check it into the webapi install; could also check it alongside the main broadsea dockerfile
-create a separate user or figure out the default password for the postgres user
-separate the bigquery deployment into a separate jinja file so you can potentially change it separately
-test deployment with cdm in a separate project
-
-deferred
-- move to gke (would handle auto updates, would need to figure out how to set non-ephemeral address for nodes, would add some complication to connecting)
-- use shiro for auth
-
-### Alternative 
-
-- create two external ip addresses in cloud shell
-```bash
-export PROJECT_ID=`gcloud config get-value project`
-gcloud config set project ${PROJECT_ID?}
-export PROJECT_NUMBER=`gcloud projects list --format 'value(PROJECT_NUMBER)' --filter PROJECT_ID=$PROJECT`
-export REGION=us-central1
-export ZONE=us-central1-a
-gcloud config set compute/zone ${ZONE?}
-
-# Create service account key
-gcloud iam service-accounts keys create ohdsi-bigquery.p12 --iam-account ${PROJECT_NUMBER?}-compute@developer.gserviceaccount.com --key-file-type=p12
-gsutil mb -c regional -l ${REGION?} gs://bigquery-key-${PROJECT_NUMBER?}
-gsutil cp ohdsi-bigquery.p12 gs://bigquery-key-${PROJECT_NUMBER?}/
-rm ohdsi-bigquery.p12
-
-# Create cloud sql postgres instance
-TODO
-
-# Create gke cluster 
-gcloud components install kubectl
-gcloud container clusters create broadsea-cluster --num-nodes=1
-# Can't be used in combination with --num-nodes=1 --machine-type=f1-micro
-gcloud alpha container clusters create broadsea-cluster --enable-kubernetes-alpha # until 1.8 is available
-
-# Deploy both containers
-kubectl create secret generic ohdsi-bigquery --from-file=./ohdsi-bigquery.p12 # https://kubernetes.io/docs/concepts/configuration/secret/
-# TODO - create a yaml file
-# (cancelled) build a local image with the p12 file included and upload to gcr (need to enable gcr with glcoud service-management enable ... ...)
-# (cancelled) create a gcePersistentDisk 
-# (cancelled) copy the p12 file using a gcs command run as part of starting the container (need to ensure gsutil is installed, also need to authenticate from inside the container) - could use a kubectl cp before running anything and on any restart
-# TODO - set environment variables with jdbc urls, passwords, etc. using --env="var=value" on the run command or in the yaml file
-kubectl run broadsea-methods --image=ohdsi/broadsea-methodslibrary --port=8787
-kubectl create -f broadsea
-# Use a multi-container pod https://lukemarsden.github.io/docs/user-guide/pods/multi-container/
-
-# Port forwarding
-gcloud --project ${PROJECT_ID?} --zone=${ZONE?} container clusters get-credentials broadsea-cluster
-export METHODS_PODNAME=`kubectl get pods -o jsonpath={.items..metadata.name} --selector=run=broadsea-methods`
-kubectl port-forward ${METHODS_PODNAME?} 8787:8787
-
-# Shell to containers
-kubectl exec broadsea-methods-1737533209-ngb7l -i -t -- bash
-kubectl exec broadsea-webtools-3776678029-hpnwj -t -i -- more /var/log/supervisor/deploy-script-stderr---supervisor-jii9ye.log
-
-
-# Old
-gcloud compute addresses create broadsea-methods-ip --region ${REGION?}
-export BROADSEA_METHODS_IP=`gcloud compute addresses describe broadsea-methods-ip --region ${REGION?} --format 'value(address)'`
-gcloud compute addresses create broadsea-webtools-ip --region ${REGION?}
-export BROADSEA_WEBTOOLS_IP=`gcloud compute addresses describe broadsea-webtools-ip --region ${REGION?} --format 'value(address)'`
-gcloud compute --project "${PROJECT?}" instances create "broadsea-methods-vm" \
---zone "${REGION?}-a" \
---machine-type "n1-standard-1" \
---subnet "default" \
---address ${BROADSEA_METHODS_IP?} \
---metadata "gce-container-declaration=spec:\u000a  containers:\u000a    - name: broadsea-methods-vm\u000a      image: ohdsi/broadsea-methodslibrary\u000a      volumeMounts:\u000a        - name: host-path-1\u000a          mountPath: /tmp/drivers\u000a          readOnly: true\u000a      stdin: false\u000a      tty: false\u000a  restartPolicy: Always\u000a  volumes:\u000a    - name: host-path-1\u000a      hostPath:\u000a        path: /tmp/drivers\u000a" \
---maintenance-policy "MIGRATE" \
---service-account "${PROJECT_NUMBER?}-compute@developer.gserviceaccount.com" \
---scopes "https://www.googleapis.com/auth/cloud-platform" \
---image "cos-beta-62-9901-37-0" \
---image-project "cos-cloud" \
---boot-disk-size "10" \
---boot-disk-type "pd-standard" \
---boot-disk-device-name "broadsea-methods-vm"
-
-
-```
-
-
 
 ## Creating the CDM schema in BigQuery
 
