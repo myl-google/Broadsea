@@ -13,38 +13,14 @@
 # limitations under the License.
 
 imports:
-- path: cos.jinja
-#- path: broadsea_methods_manifest.yaml
-#  name: broadsea_methods_manifest
-#- path: broadsea_webtools_manifest.yaml
-#  name: broadsea_webtools_manifest
-#- path: container_vm.jinja
-#- path: postgres.jinja
+- path: ohdsi.jinja
 
 resources:
-#  - name: methods-vm
-#    type: container_vm.jinja
-#    properties:
-#      zone: us-central1-a
-#      region: us-central1
-#      containerImage: family/container-vm
-#      containerManifest: broadsea_methods_manifest
-#  - name: webtools-vm
-#    type: container_vm.jinja
-#    properties:
-#      zone: us-central1-a
-#      region: us-central1
-#      containerImage: family/container-vm
-#      containerManifest: broadsea_webtools_manifest
   - name: broadsea
-    type: cos.jinja
+    type: ohdsi.jinja
     properties:
       zone: us-central1-a
       region: us-central1
       tempDataset: temp1
       cdmDataset: cdm1
       ohdsiDataset: ohdsi1
-#  - name: postgres
-#    type: postgres.jinja
-#    properties:
-#      zone: us-central1-a

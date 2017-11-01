@@ -1,1 +1,1 @@
-gcloud deployment-manager deployments delete broadsea-deployment44 
+gcloud deployment-manager deployments delete ohdsi-deployment
