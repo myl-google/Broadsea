@@ -116,27 +116,63 @@ resources:
                 -- EVIDENCE daimon
                 INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (4, 1, 3, '{{ properties['ohdsiDataset'] }}', 2);
 
-            - path: /tmp/update_source.sh
+            - path: /tmp/update_source.py
               permissions: 0555
               owner: root
               content: |
-                # Waits for the the source table to appear in the postgres schema and then populates it and restarts the docker container 
-                export WEBTOOLS_ID=`docker ps -aqf "name=broadsea-webtools"`
-                export HOST=$(ref.{{ BASE_NAME }}-postgres-instance.ipAddresses[0].ipAddress)
-                while [ ! -s /tmp/query_result.txt ]; do
-                  docker exec -i -t $WEBTOOLS_ID /usr/bin/psql "host=$HOST dbname=postgres user=ohdsi-postgres-user password=ohdsi-postgres-password" -A -t \
-                    -c "SELECT table_schema, table_name FROM information_schema.tables WHERE table_schema='ohdsi' AND table_name='source';" \
-                    > /tmp/query_result.txt
-                  sleep 10
-                done
-                docker cp /tmp/source_source_daimon.sql $WEBTOOLS_ID:/tmp/
-                docker exec -i -t $WEBTOOLS_ID /usr/bin/psql "host=$HOST dbname=postgres user=ohdsi-postgres-user password=ohdsi-postgres-password" -f /tmp/source_source_daimon.sql
-                docker restart $WEBTOOLS_ID
+                #!/usr/bin/python
+                import subprocess
+                import time
+                
+                def getContainerId():
+                  return subprocess.Popen(['docker', 'ps', '-aqf' 'name=broadsea-webtools'], stdout=subprocess.PIPE).communicate()[0].strip()
+                
+                def runQuery(query):
+                  CMD=['docker', 'exec', getContainerId(), '/usr/bin/psql',
+                       'host=$(ref.{{ BASE_NAME }}-postgres-instance.ipAddresses[0].ipAddress) dbname=postgres user=ohdsi-postgres-user password=ohdsi-postgres-password',
+                       '-A', '-t'] + query
+                  return subprocess.Popen(CMD, stdout=subprocess.PIPE).communicate()[0]
+                
+                def runCommand(cmd):
+                  return subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0]
+                
+                # Wait for table to be created
+                while True:
+                  table_count = runQuery(['-c', 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=\'ohdsi\' AND table_name=\'source\';'])
+                  if len(table_count.strip()) == 0 or int(table_count) > 0: break
+                  print "Did not find ohdsi.source table. Sleeping for 10 seconds"
+                  time.sleep(10)
+                print "Found ohdsi.source table"
+                
+                # Populate the table if it's empty
+                while True:
+                  source_count = runQuery(['-c', 'SELECT COUNT(*) FROM ohdsi.source'])
+                  print "Found %d rows in ohdsi.source" % int(source_count)
+                  if int(source_count) == 0:
+                    container_id  = getContainerId()
+                    runCommand(['docker', 'cp', '/tmp/source_source_daimon.sql', container_id + ':/tmp/'])
+                    runQuery(['-f', '/tmp/source_source_daimon.sql'])
+                    runCommand(['docker', 'restart', container_id])
+                  print "Sleeping for 10 minutes"
+                  time.sleep(600)
+
+            - path: /etc/systemd/system/broadsea-update-source.service
+              permissions: 0644
+              owner: root
+              content: |
+                [Unit]
+                Description=Update the source in the postgres database
+            
+                [Service]
+                ExecStart=/tmp/update_source.py
+                Restart=on-failure
 
             - path: /tmp/tail_weblog.sh
               permissions: 0555
               owner: root
               content: |
+                #!/bin/bash
+                # Utility to view the tail of the webtools log
                 export WEBTOOLS_ID=`docker ps -aqf "name=broadsea-webtools"`
                 export ERRLOG=`docker exec $WEBTOOLS_ID /usr/bin/find /var/log/supervisor | grep stderr`
                 docker exec -i -t $WEBTOOLS_ID tail -f $ERRLOG
@@ -145,7 +181,7 @@ resources:
             - systemctl daemon-reload
             - systemctl start broadsea-methods.service
             - systemctl start broadsea-webtools.service
-            - /tmp/update_source.sh
+            - systemctl start broadsea-update-source.service
 
     disks:
       - deviceName: boot

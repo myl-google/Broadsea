@@ -1,15 +1,21 @@
 # Deployment manager instructions for Broadsea on GCP
 
 ## TODO
-fix problem with user blocking deletion
-populate source table in postgres on first startup (wait for the server to create the tables by polling, then execute script)
+populate source table in postgres on first startup
 add a script on the methods image to run achilles
 clean up unused scripts and directory structure
 test the deployment on the synpuf data and make sure all the visualizations are working (update source to point at the data in ohdsi-in-a-box)
 test deployment with cdm in a separate project (need to permission the compute engine service account to access the bigquery datasets)
-push broadsea changes to origin
+test two deployments sharing the same cdm
+push all three broadsea repository changes to origin
+
+## things to test when updating the configs
+- source gets added
+- atlas starts and vocabulary search works
+- achilles runs through with no errors
 
 ## deferred
+- file bug for internal resource error on postgres user during delete
 - get preinstall of R packages to work properly (not just put it in a temporary session?)
 - restrict access to gcr.io images
 - move to gke (would handle auto updates, would need to figure out how to set non-ephemeral address for nodes, would add some complication to connecting)
