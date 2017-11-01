@@ -1,12 +1,8 @@
 # Deployment manager instructions for Broadsea on GCP
 
 ## TODO
-update to webapi 2.2 and achilles 1.5
-rebuild the schema at the latest release
 test the deployment on the synpuf data and make sure all the visualizations are working (update source to point at the data in ohdsi-in-a-box)
-change instructions to get the schema from a release
 push all three broadsea repository changes to origin
-clean up unused scripts and directory structure
 documentation changes
 g3doc changes
 
@@ -17,15 +13,21 @@ g3doc changes
 
 ## Usage instructions
 
-### Run achilles
+TODO - create deployment
 
-source('/ohdsi-deployment/runAchilles.R')
+Run achilles:
 
-### Instructions for rebuilding the webtools and methods images:
+source('/ohdsi-scripts/runAchilles.R')
+
+Instructions for rebuilding the webtools and methods images:
 
 build-upload.sh in the corresponding forks
 
-# Manual setup instructions for Broadsea on GCP
+# Manual setup instructions for Broadsea using docker-compose in a VM
+
+Files relevant to this option are in the docker_compose/ directory.  The deployment manager
+option is likely better in almost all cases, but these instructions are retained here for 
+historical interest.
 
 ## Creating a VM to run BroadSea
 
