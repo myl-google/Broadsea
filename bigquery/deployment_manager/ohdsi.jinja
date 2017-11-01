@@ -240,7 +240,7 @@ resources:
     datasetReference:
       datasetId: {{ properties['ohdsiDataset'] }}
 {# Generated bigquery schema below here #}
-- name: concept
+- name: cdmDataset_concept
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -271,7 +271,7 @@ resources:
         type: date
       - name: invalid_reason
         type: string
-- name: vocabulary
+- name: cdmDataset_vocabulary
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -292,7 +292,7 @@ resources:
         type: string
       - name: vocabulary_concept_id
         type: integer
-- name: domain
+- name: cdmDataset_domain
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -309,7 +309,7 @@ resources:
         type: string
       - name: domain_concept_id
         type: integer
-- name: concept_class
+- name: cdmDataset_concept_class
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -326,7 +326,7 @@ resources:
         type: string
       - name: concept_class_concept_id
         type: integer
-- name: concept_relationship
+- name: cdmDataset_concept_relationship
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -349,7 +349,7 @@ resources:
         type: date
       - name: invalid_reason
         type: string
-- name: relationship
+- name: cdmDataset_relationship
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -372,7 +372,7 @@ resources:
         type: string
       - name: relationship_concept_id
         type: integer
-- name: concept_synonym
+- name: cdmDataset_concept_synonym
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -389,7 +389,7 @@ resources:
         type: string
       - name: language_concept_id
         type: integer
-- name: concept_ancestor
+- name: cdmDataset_concept_ancestor
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -408,7 +408,7 @@ resources:
         type: integer
       - name: max_levels_of_separation
         type: integer
-- name: source_to_concept_map
+- name: cdmDataset_source_to_concept_map
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -437,7 +437,7 @@ resources:
         type: date
       - name: invalid_reason
         type: string
-- name: drug_strength
+- name: cdmDataset_drug_strength
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -472,7 +472,7 @@ resources:
         type: date
       - name: invalid_reason
         type: string
-- name: cohort_definition
+- name: cdmDataset_cohort_definition
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -497,7 +497,7 @@ resources:
         type: integer
       - name: cohort_initiation_date
         type: date
-- name: attribute_definition
+- name: cdmDataset_attribute_definition
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -518,7 +518,7 @@ resources:
         type: integer
       - name: attribute_syntax
         type: string
-- name: cdm_source
+- name: cdmDataset_cdm_source
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -549,7 +549,7 @@ resources:
         type: string
       - name: vocabulary_version
         type: string
-- name: person
+- name: cdmDataset_person
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -596,7 +596,7 @@ resources:
         type: string
       - name: ethnicity_source_concept_id
         type: integer
-- name: observation_period
+- name: cdmDataset_observation_period
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -621,7 +621,7 @@ resources:
         type: timestamp
       - name: period_type_concept_id
         type: integer
-- name: specimen
+- name: cdmDataset_specimen
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -662,7 +662,7 @@ resources:
         type: string
       - name: disease_status_source_value
         type: string
-- name: death
+- name: cdmDataset_death
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -687,7 +687,7 @@ resources:
         type: string
       - name: cause_source_concept_id
         type: integer
-- name: visit_occurrence
+- name: cdmDataset_visit_occurrence
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -732,7 +732,7 @@ resources:
         type: string
       - name: preceding_visit_occurrence_id
         type: integer
-- name: procedure_occurrence
+- name: cdmDataset_procedure_occurrence
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -769,7 +769,7 @@ resources:
         type: integer
       - name: qualifier_source_value
         type: string
-- name: drug_exposure
+- name: cdmDataset_drug_exposure
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -824,7 +824,7 @@ resources:
         type: string
       - name: dose_unit_source_value
         type: string
-- name: device_exposure
+- name: cdmDataset_device_exposure
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -863,7 +863,7 @@ resources:
         type: string
       - name: device_source_concept_id
         type: integer
-- name: condition_occurrence
+- name: cdmDataset_condition_occurrence
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -904,7 +904,7 @@ resources:
         type: string
       - name: condition_status_concept_id
         type: integer
-- name: measurement
+- name: cdmDataset_measurement
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -951,7 +951,7 @@ resources:
         type: string
       - name: value_source_value
         type: string
-- name: note
+- name: cdmDataset_note
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -988,7 +988,7 @@ resources:
         type: integer
       - name: note_source_value
         type: string
-- name: note_nlp
+- name: cdmDataset_note_nlp
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1027,7 +1027,7 @@ resources:
         type: string
       - name: term_modifiers
         type: string
-- name: observation
+- name: cdmDataset_observation
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1072,7 +1072,7 @@ resources:
         type: string
       - name: qualifier_source_value
         type: string
-- name: fact_relationship
+- name: cdmDataset_fact_relationship
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1093,7 +1093,7 @@ resources:
         type: integer
       - name: relationship_concept_id
         type: integer
-- name: location
+- name: cdmDataset_location
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1120,7 +1120,7 @@ resources:
         type: string
       - name: location_source_value
         type: string
-- name: care_site
+- name: cdmDataset_care_site
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1143,7 +1143,7 @@ resources:
         type: string
       - name: place_of_service_source_value
         type: string
-- name: provider
+- name: cdmDataset_provider
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1180,7 +1180,7 @@ resources:
         type: string
       - name: gender_source_concept_id
         type: integer
-- name: payer_plan_period
+- name: cdmDataset_payer_plan_period
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1205,7 +1205,7 @@ resources:
         type: string
       - name: family_source_value
         type: string
-- name: cost
+- name: cdmDataset_cost
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1260,7 +1260,7 @@ resources:
         type: integer
       - name: drg_source_value
         type: string
-- name: cdm_cohort
+- name: cdmDataset_cohort
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1279,7 +1279,7 @@ resources:
         type: date
       - name: cohort_end_date
         type: date
-- name: cohort_attribute
+- name: cdmDataset_cohort_attribute
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1304,7 +1304,7 @@ resources:
         type: float
       - name: value_as_concept_id
         type: integer
-- name: drug_era
+- name: cdmDataset_drug_era
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1329,7 +1329,7 @@ resources:
         type: integer
       - name: gap_days
         type: integer
-- name: dose_era
+- name: cdmDataset_dose_era
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1354,7 +1354,7 @@ resources:
         type: date
       - name: dose_era_end_date
         type: date
-- name: condition_era
+- name: cdmDataset_condition_era
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1377,7 +1377,7 @@ resources:
         type: date
       - name: condition_occurrence_count
         type: integer
-- name: cohort
+- name: ohdsiDataset_cohort
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1396,7 +1396,7 @@ resources:
         type: date
       - name: cohort_end_date
         type: date
-- name: cohort_inclusion
+- name: ohdsiDataset_cohort_inclusion
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1415,7 +1415,7 @@ resources:
         type: string
       - name: description
         type: string
-- name: cohort_inclusion_result
+- name: ohdsiDataset_cohort_inclusion_result
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1432,7 +1432,7 @@ resources:
         type: integer
       - name: person_count
         type: integer
-- name: cohort_inclusion_stats
+- name: ohdsiDataset_cohort_inclusion_stats
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1453,7 +1453,7 @@ resources:
         type: integer
       - name: person_total
         type: integer
-- name: cohort_summary_stats
+- name: ohdsiDataset_cohort_summary_stats
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1470,7 +1470,7 @@ resources:
         type: integer
       - name: final_count
         type: integer
-- name: feas_study_inclusion_stats
+- name: ohdsiDataset_feas_study_inclusion_stats
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1493,7 +1493,7 @@ resources:
         type: integer
       - name: person_total
         type: integer
-- name: feas_study_index_stats
+- name: ohdsiDataset_feas_study_index_stats
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1510,7 +1510,7 @@ resources:
         type: integer
       - name: match_count
         type: integer
-- name: feas_study_result
+- name: ohdsiDataset_feas_study_result
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1527,7 +1527,7 @@ resources:
         type: integer
       - name: person_count
         type: integer
-- name: heracles_analysis
+- name: ohdsiDataset_heracles_analysis
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1554,7 +1554,7 @@ resources:
         type: string
       - name: analysis_type
         type: string
-- name: heracles_heel_results
+- name: ohdsiDataset_heracles_heel_results
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1571,7 +1571,7 @@ resources:
         type: integer
       - name: heracles_heel_warning
         type: string
-- name: heracles_results
+- name: ohdsiDataset_heracles_results
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1600,7 +1600,7 @@ resources:
         type: integer
       - name: last_update_time
         type: timestamp
-- name: heracles_results_dist
+- name: ohdsiDataset_heracles_results_dist
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1647,7 +1647,7 @@ resources:
         type: float
       - name: last_update_time
         type: timestamp
-- name: ir_analysis_dist
+- name: ohdsiDataset_ir_analysis_dist
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1688,7 +1688,7 @@ resources:
         type: integer
       - name: max_value
         type: integer
-- name: ir_analysis_result
+- name: ohdsiDataset_ir_analysis_result
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1713,7 +1713,7 @@ resources:
         type: integer
       - name: cases
         type: integer
-- name: ir_analysis_strata_stats
+- name: ohdsiDataset_ir_analysis_strata_stats
   type: bigquery.v2.table
   metadata:
     dependsOn:
@@ -1738,7 +1738,7 @@ resources:
         type: integer
       - name: cases
         type: integer
-- name: ir_strata
+- name: ohdsiDataset_ir_strata
   type: bigquery.v2.table
   metadata:
     dependsOn:
