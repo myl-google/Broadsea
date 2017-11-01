@@ -1,3 +1,17 @@
+"""This is used to generate the deployment manager config for the CDM tables and OHDSI tables.
+
+To re-generate the tables:
+- edit ohdsi.jinja and remove all the biguery tables at the end
+- download a release of the common data model at https://github.com/OHDSI/CommonDataModel/releases 
+- unzip the release and set the CDM_PATH environment variable to point at the directory
+- run "python create_bigquery_deployment.py -d cdmDataset -s ${CDM_PATH?}/PostgreSQL/OMOP CDM ddl - PostgreSQL.sql" >> ohdsi.jinja
+- ssh to the deployed vm and run the following:
+  docker exec -i -t ${BROADSEA_WEBTOOLS_CONTAINER_ID?} pg_dump "host=${POSTGRES_HOST_IP} dbname=postgres user=postgres password=ohdsi" > /ohdsi-deployment/ohdsi.sql
+- on your workstation:
+  gcloud beta compute scp --zone us-central1-a ohdsi-deployment-vm:/ohdsi-deployment/ohdsi.sql .
+  python create_bigquery_deployment.py -d ohdsiDataset -s ohdsi.sql -w results_tables_whitelist.txt >> ohdsi.jinja
+"""
+
 import getopt
 import sys
 

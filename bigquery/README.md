@@ -17,28 +17,12 @@ g3doc changes
 
 ## Usage instructions
 
-# Run achilles
+### Run achilles
 
 source('/ohdsi-deployment/runAchilles.R')
 
-## instructions for regenerating the bigquery deployment to pick up schema updates
-# edit deployment_manager/cos.jina and remove all the biguery tables at the end
-wget https://raw.githubusercontent.com/OHDSI/CommonDataModel/master/PostgreSQL/OMOP%20CDM%20ddl%20-%20PostgreSQL.sql
-#ren to cdm.sql
-python create_bigquery_deployment.py -d cdmDataset -s cdm.sql  >> deployment_manager/cos.jinja
-#cloud_sql_proxy --instances=ohdsi-in-a-box:us-central1:broadsea-deployment29-postgres=tcp:5432
-On the vm:
-docker exec -i -t <container_id> /bin/bash
-apt-get update
-apt-get install postgres-client
-pg_dump "host=<host_ip> dbname=postgres user=postgres password=ohdsi" > /ohdsi.sql
-exit
-docker cp <container_id>:/ohdsi.sql .
-On your workstation:
-gcloud beta compute scp --project ohdsi-in-a-box --zone us-central1-a broadsea-deployment28-vm:/home/myl/ohdsi.sql .
-python create_bigquery_deployment.py -d ohdsiDataset -s ohdsi.sql -w results_tables_whitelist.txt >> deployment_manager/cos.jinja
+### Instructions for rebuilding the webtools and methods images:
 
-## instructions for rebuilding the webtools and methods images:
 build-upload.sh in the corresponding forks
 
 # Manual setup instructions for Broadsea on GCP
