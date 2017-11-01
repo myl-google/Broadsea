@@ -1,28 +1,18 @@
 # Deployment manager instructions for Broadsea on GCP
 
 ## TODO
-create postgres user and password with a separate gcloud command during deploy
-clean up old deployments by updating with the user removed and an abandon policy
 add a script on the methods image to run achilles
-clean up unused scripts and directory structure
 test the deployment on the synpuf data and make sure all the visualizations are working (update source to point at the data in ohdsi-in-a-box)
-test deployment with cdm in a separate project (need to permission the compute engine service account to access the bigquery datasets)
-test two deployments sharing the same cdm
+consider updating to webapi 2.2 and achilles 1.5
 push all three broadsea repository changes to origin
+clean up unused scripts and directory structure
+documentation changes
+g3doc changes
 
 ## things to test when updating the configs
 - source gets added
 - atlas starts and vocabulary search works
 - achilles runs through with no errors
-
-## deferred
-- file bug for internal resource error on postgres user during delete
-- get preinstall of R packages to work properly (not just put it in a temporary session?)
-- restrict access to gcr.io images
-- move to gke (would handle auto updates, would need to figure out how to set non-ephemeral address for nodes, would add some complication to connecting)
-- use shiro for auth
-- move scripts to a dedicated script directory rather than /tmp
-- serve the stderr weblog on a port in the vm (maybe an apache config)
 
 ## instructions for regenerating the bigquery deployment to pick up schema updates
 # edit deployment_manager/cos.jina and remove all the biguery tables at the end
@@ -42,7 +32,7 @@ gcloud beta compute scp --project ohdsi-in-a-box --zone us-central1-a broadsea-d
 python create_bigquery_deployment.py -d ohdsiDataset -s ohdsi.sql -w results_tables_whitelist.txt >> deployment_manager/cos.jinja
 
 ## instructions for rebuilding the webtools and methods images:
-build-upload.sh
+build-upload.sh in the corresponding forks
 
 ## Useful commands
 gcloud compute ssh $VM_NAME --project $PROJECT --zone $VM_ZONE --ssh-flag="-L" --ssh-flag="8080:localhost:8080" --ssh-flag="-L" --ssh-flag="8787:localhost:8787"

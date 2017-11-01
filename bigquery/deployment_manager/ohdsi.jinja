@@ -92,7 +92,7 @@ resources:
                 ExecStopPost=/usr/bin/docker rm broadsea-webtools
                 Restart=on-failure
 
-            - path: /tmp/source_source_daimon.sql
+            - path: /usr/local/source_source_daimon.sql
               permissions: 0666
               owner: root
               content: |
@@ -116,7 +116,7 @@ resources:
                 -- EVIDENCE daimon
                 INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (4, 1, 3, '{{ properties['ohdsiDataset'] }}', 2);
 
-            - path: /tmp/update_source.py
+            - path: /usr/local/update_source.py
               permissions: 0555
               owner: root
               content: |
@@ -139,7 +139,7 @@ resources:
                 # Wait for table to be created
                 while True:
                   table_count = runQuery(['-c', 'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=\'ohdsi\' AND table_name=\'source\';'])
-                  if len(table_count.strip()) == 0 or int(table_count) > 0: break
+                  if len(table_count.strip()) > 0 and int(table_count) > 0: break
                   print "Did not find ohdsi.source table. Sleeping for 10 seconds"
                   time.sleep(10)
                 print "Found ohdsi.source table"
@@ -150,7 +150,7 @@ resources:
                   print "Found %d rows in ohdsi.source" % int(source_count)
                   if int(source_count) == 0:
                     container_id  = getContainerId()
-                    runCommand(['docker', 'cp', '/tmp/source_source_daimon.sql', container_id + ':/tmp/'])
+                    runCommand(['docker', 'cp', '/usr/local/source_source_daimon.sql', container_id + ':/tmp/'])
                     runQuery(['-f', '/tmp/source_source_daimon.sql'])
                     runCommand(['docker', 'restart', container_id])
                   print "Sleeping for 10 minutes"
@@ -164,10 +164,10 @@ resources:
                 Description=Update the source in the postgres database
             
                 [Service]
-                ExecStart=/tmp/update_source.py
+                ExecStart=/usr/local/update_source.py
                 Restart=on-failure
 
-            - path: /tmp/tail_weblog.sh
+            - path: /usr/local/tail_weblog.sh
               permissions: 0555
               owner: root
               content: |
@@ -200,7 +200,7 @@ resources:
 - name: {{BASE_NAME}}-postgres-instance
   type: sqladmin.v1beta4.instance
   properties:
-    name: {{BASE_NAME}}-postgres
+    name: {{BASE_NAME}}-postgres-{{ properties['postgresInstanceSuffix'] }} 
     databaseVersion: POSTGRES_9_6
     gceZone: {{ properties['zone'] }}
     settings:

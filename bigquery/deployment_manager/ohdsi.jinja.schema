@@ -23,6 +23,7 @@ required:
   - tempDataset
   - cdmDataset
   - ohdsiDataset
+  - postgresInstanceSuffix
 
 properties:
   zone:
@@ -39,4 +40,7 @@ properties:
     type: string
   ohdsiDataset:
     description: BigQuery dataset for storing the OHDSI schema
+    type: string
+  postgresInstanceSuffix:
+    description: A name to uniquify the postgres instance name since instance names can't be re-used
     type: string
