@@ -1,7 +1,8 @@
 # Deployment manager instructions for Broadsea on GCP
 
 ## TODO
-populate source table in postgres on first startup
+create postgres user and password with a separate gcloud command during deploy
+clean up old deployments by updating with the user removed and an abandon policy
 add a script on the methods image to run achilles
 clean up unused scripts and directory structure
 test the deployment on the synpuf data and make sure all the visualizations are working (update source to point at the data in ohdsi-in-a-box)

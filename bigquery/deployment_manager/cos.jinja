@@ -209,13 +209,6 @@ resources:
         authorizedNetworks:
         - name: broadsea-vm
           value: $(ref.{{ BASE_NAME }}-address.address)
-- name: {{BASE_NAME}}-postgres-user
-  type: sqladmin.v1beta4.user
-  properties:
-    instance: $(ref.{{BASE_NAME}}-postgres-instance.name)
-    host: "%"
-    name: ohdsi-postgres-user
-    password: ohdsi-postgres-password
 - name: tempDatasetResource
   type: bigquery.v2.dataset
   properties:
