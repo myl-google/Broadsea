@@ -55,7 +55,7 @@ resources:
                 Description=Start the broadsea methods docker container
             
                 [Service]
-                ExecStart=/usr/bin/docker run --rm -u 0 -p 8787:8787 -p 6111:6111 --name=broadsea-methodslibrary gcr.io/ohdsi-in-a-box/broadsea-methods-bigquery
+                ExecStart=/usr/bin/docker run --rm -u 0 -p 8787:8787 -p 6111:6111 --name=broadsea-methodslibrary -v /etc/ohdsi-deployment/:/ohdsi-deployment gcr.io/ohdsi-in-a-box/broadsea-methods-bigquery
                 ExecStop=/usr/bin/docker stop broadsea-methodslibrary
                 ExecStopPost=/usr/bin/docker rm broadsea-methodslibrary
                 Restart=on-failure
@@ -69,6 +69,7 @@ resources:
             
                 [Service]
                 ExecStart=/usr/bin/docker run --rm -u 0 -p 8080:8080 --name=broadsea-webtools \
+                  -v /etc/ohdsi-deployment/:/ohdsi-deployment \
                   --env=WEBAPI_URL=http://localhost:8080 \
                   --env=ENV=webapi-postgresql \
                   --env=DATASOURCE_DRIVERCLASSNAME=org.postgresql.Driver \
@@ -92,7 +93,7 @@ resources:
                 ExecStopPost=/usr/bin/docker rm broadsea-webtools
                 Restart=on-failure
 
-            - path: /usr/local/source_source_daimon.sql
+            - path: /etc/ohdsi-deployment/source_source_daimon.sql
               permissions: 0666
               owner: root
               content: |
@@ -116,7 +117,21 @@ resources:
                 -- EVIDENCE daimon
                 INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (4, 1, 3, '{{ properties['ohdsiDataset'] }}', 2);
 
-            - path: /usr/local/update_source.py
+            - path: /etc/ohdsi-deployment/runAchilles.R
+              permissions: 0666
+              owner: root
+              content: |
+                install.packages("devtools")
+                library(devtools)
+                install_github("ohdsi/DatabaseConnector")
+                library(DatabaseConnector)
+                install_github("ohdsi/SqlRender")
+                install_github("myl-google/Achilles")
+                library(Achilles)
+                connectionDetails = createConnectionDetails(dbms="bigquery",server="{{ env['project'] }}", pathToDriver = "/tmp/drivers", user="", password="")
+                achilles(connectionDetails, cdmDatabaseSchema="{{ properties['cdmDataset'] }}", resultsDatabaseSchema="{{ properties['ohdsiDataset'] }}", sourceName="OHDSI CDM V5 Database", cdmVersion = "5", vocabDatabaseSchema = "{{ properties['cdmDataset'] }}", runHeel=TRUE)
+
+            - path: /etc/ohdsi-deployment/update_source.py
               permissions: 0555
               owner: root
               content: |
@@ -150,8 +165,7 @@ resources:
                   print "Found %d rows in ohdsi.source" % int(source_count)
                   if int(source_count) == 0:
                     container_id  = getContainerId()
-                    runCommand(['docker', 'cp', '/usr/local/source_source_daimon.sql', container_id + ':/tmp/'])
-                    runQuery(['-f', '/tmp/source_source_daimon.sql'])
+                    runQuery(['-f', '/ohdsi-deployment/source_source_daimon.sql'])
                     runCommand(['docker', 'restart', container_id])
                   print "Sleeping for 10 minutes"
                   time.sleep(600)
@@ -164,10 +178,10 @@ resources:
                 Description=Update the source in the postgres database
             
                 [Service]
-                ExecStart=/usr/local/update_source.py
+                ExecStart=/etc/ohdsi-deployment/update_source.py
                 Restart=on-failure
 
-            - path: /usr/local/tail_weblog.sh
+            - path: /etc/ohdsi-deployment/tail_weblog.sh
               permissions: 0555
               owner: root
               content: |
