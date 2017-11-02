@@ -1,27 +1,58 @@
-# Deployment manager instructions for Broadsea on GCP
+# Deployment manager instructions for Broadsea on Bigquery
 
-## TODO
-test the deployment on the synpuf data and make sure all the visualizations are working (update source to point at the data in ohdsi-in-a-box)
-push all three broadsea repository changes to origin
-documentation changes
-g3doc changes
+Using the provided deployment manager configs is the simplest way of deploying.
+An alternative, more manual, approach is also detailed in the "manual setup
+instructions for Broadsea using docker-compose in a VM" section below.
 
-## things to test when updating the configs
-- source gets added
-- atlas starts and vocabulary search works
-- achilles runs through with no errors
+To create a deployment, either use an existing GCP project or create one as a
+free trial at https://cloud.google.com/ .  Next, working from the machine where
+you want to view the OHDSI tools in the browser, install the Cloud SDK by
+following the instructions at https://cloud.google.com/sdk/downloads and run
+the following two commands to login and set your default project id.
 
-## Usage instructions
+```
+gcloud auth login
+gcloud config set project YOUR_PROJECT_NAME
+```
 
-TODO - create deployment
+Next, download the configs and scripts at
+https://github.com/myl-google/Broadsea/tree/master/bigquery/deployment_manager
+.  You can either download the individual files or use the link at
+https://github.com/myl-google/Broadsea/archive/master.zip to get the whole
+repository, then unzip it and change to the bigquery/deployment_manager
+subdirectory.
 
-Run achilles:
+Now you can run the following to create a full deployment:
 
+```
+create-deployment.sh
+```
+
+This will take several minutes and create a VM to run Broadsea (which includes
+RStudio and Atlas), a Postgresql instance to host the OHDSI database schema, and
+bigquery datasets and tables to host the Common Data Model (aka OMOP) schema.
+It is recommended that you load your data into the created Bigquery tables to ensure that the
+schema version matches what is expected by the software.  However, it is also
+possible to point the deployment at existing data.
+
+After your data is loaded, you can connect to the VM with port forwarding by
+running the following:
+
+```
+connect.sh
+```
+
+You must have this connection open every time you wish to use the tools.  You
+can now connect to RStudio by visting http://localhost:8787 in your browser.
+The default username and password are both "rstudio".  To run the achilles
+analysis scripts, execute the following in Rstudio:
+
+```
 source('/ohdsi-scripts/runAchilles.R')
+```
 
-Instructions for rebuilding the webtools and methods images:
-
-build-upload.sh in the corresponding forks
+To open Atlas, visit http://localhost:8080/atlas in your browser.  There is a
+link to the user guide from the default Home page.
 
 # Manual setup instructions for Broadsea using docker-compose in a VM
 

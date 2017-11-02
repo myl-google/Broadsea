@@ -24,4 +24,4 @@ resources:
       tempDataset: temp1
       cdmDataset: cdm1
       ohdsiDataset: ohdsi1
-      postgresInstanceSuffix: b
+      postgresInstanceSuffix: c

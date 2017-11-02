@@ -127,7 +127,7 @@ resources:
                 install_local(path="/ohdsi-deployment/SqlRender")
                 install_local(path="/ohdsi-deployment/Achilles")
                 library(Achilles)
-                connectionDetails = createConnectionDetails(dbms="bigquery",server="{{ env['project'] }}", pathToDriver = "/tmp/drivers", user="", password="")
+                connectionDetails = createConnectionDetails(dbms="bigquery", server="{{ env['project'] }}", pathToDriver = "/tmp/drivers", user="", password="")
                 achilles(connectionDetails, cdmDatabaseSchema="{{ properties['cdmDataset'] }}", resultsDatabaseSchema="{{ properties['ohdsiDataset'] }}", sourceName="OHDSI CDM V5 Database", cdmVersion = "5", vocabDatabaseSchema = "{{ properties['cdmDataset'] }}", runHeel=TRUE)
 
             - path: /etc/ohdsi-scripts/update_source.py
@@ -164,7 +164,7 @@ resources:
                   print "Found %d rows in ohdsi.source" % int(source_count)
                   if int(source_count) == 0:
                     container_id  = getContainerId()
-                    runQuery(['-f', '/ohdsi-scripts/source_source_daimon.sql'])
+                    print runQuery(['-f', '/ohdsi-scripts/source_source_daimon.sql'])
                     runCommand(['docker', 'restart', container_id])
                   print "Sleeping for 10 minutes"
                   time.sleep(600)
