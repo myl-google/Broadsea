@@ -27,4 +27,4 @@ To run _source_source_daimon.sql_ (after the step in the main documentation wher
 docker cp source_source_daimon.sql postgresql:/source_source_daimon.sql
 docker exec -it postgresql /bin/sh -c "su - -c 'psql -f /source_source_daimon.sql -d ohdsi' postgres"
 ```
--
+
