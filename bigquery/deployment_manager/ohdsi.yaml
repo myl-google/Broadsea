@@ -21,7 +21,7 @@ resources:
     properties:
       zone: us-central1-a
       region: us-central1
-      tempDataset: temp1
-      cdmDataset: cdm1
-      ohdsiDataset: ohdsi1
-      postgresInstanceSuffix: c
+      tempDataset: temp
+      cdmDataset: cdm
+      ohdsiDataset: ohdsi
+      postgresInstanceSuffix: a

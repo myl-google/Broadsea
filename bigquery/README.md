@@ -1,8 +1,8 @@
 # Deployment manager instructions for Broadsea on Bigquery
 
-Using the provided deployment manager configs is the simplest way of deploying.
-An alternative, more manual, approach is also detailed in the "manual setup
-instructions for Broadsea using docker-compose in a VM" section below.
+Use the provided deployment manager configs method.  An alternative, more
+manual, approach is also detailed in the "manual setup instructions for
+Broadsea using docker-compose in a VM" section below.
 
 To create a deployment, either use an existing GCP project or create one as a
 free trial at https://cloud.google.com/ .  Next, working from the machine where
@@ -12,7 +12,7 @@ the following two commands to login and set your default project id.
 
 ```
 gcloud auth login
-gcloud config set project YOUR_PROJECT_NAME
+gcloud config set project YOUR_PROJECT_ID
 ```
 
 Next, download the configs and scripts at
@@ -31,21 +31,23 @@ create-deployment.sh
 This will take several minutes and create a VM to run Broadsea (which includes
 RStudio and Atlas), a Postgresql instance to host the OHDSI database schema, and
 bigquery datasets and tables to host the Common Data Model (aka OMOP) schema.
-It is recommended that you load your data into the created Bigquery tables to ensure that the
-schema version matches what is expected by the software.  However, it is also
-possible to point the deployment at existing data.
+It is recommended that you load your data into the created Bigquery tables to
+ensure that the schema version matches what is expected by the software.
+However, it is also possible to point the deployment at existing data.
 
-After your data is loaded, you can connect to the VM with port forwarding by
-running the following:
+After your data is loaded, you can ssh to the VM:
 
 ```
 connect.sh
 ```
 
-You must have this connection open every time you wish to use the tools.  You
-can now connect to RStudio by visting http://localhost:8787 in your browser.
-The default username and password are both "rstudio".  To run the achilles
-analysis scripts, execute the following in Rstudio:
+When the connection is open, it does port forwarding so that you can access the
+web server running on the VM from your local machine. You must have a
+connection open every time you wish to access the web tools.
+
+You can now connect to RStudio by visting http://localhost:8787 in your
+browser.  The default username and password are both "rstudio".  To run the
+achilles analysis scripts, execute the following in Rstudio:
 
 ```
 source('/ohdsi-scripts/runAchilles.R')
