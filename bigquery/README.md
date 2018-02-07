@@ -22,6 +22,9 @@ https://github.com/myl-google/Broadsea/archive/master.zip to get the whole
 repository, then unzip it and change to the bigquery/deployment_manager
 subdirectory.
 
+Edit ohdsi.yaml and update the zone or dataset names if desired.  Documentation
+is available in ohdsi.jinja.schema.
+
 Now you can run the following to create a full deployment:
 
 ```

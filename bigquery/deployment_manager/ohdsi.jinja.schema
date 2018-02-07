@@ -42,5 +42,9 @@ properties:
     description: BigQuery dataset for storing the OHDSI schema
     type: string
   postgresInstanceSuffix:
-    description: A name to uniquify the postgres instance name since instance names can't be re-used
+    description: >
+      A name to uniquify the postgres instance name since instance names can't be re-used.
+      The only reason to change this is when deleting and re-creating a deployment with the
+      same name. Make sure to also change the "gcloud sql users" line in create-deployment.sh
+      if you change this value.
     type: string
