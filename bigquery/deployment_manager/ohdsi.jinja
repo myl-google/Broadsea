@@ -45,7 +45,6 @@ resources:
         - key: user-data
           value: |
             #cloud-config
-            
             write_files:
             - path: /etc/systemd/system/broadsea-methods.service
               permissions: 0644
@@ -53,9 +52,13 @@ resources:
               content: |
                 [Unit]
                 Description=Start the broadsea methods docker container
+                Wants=gcr-online.target
+                After=gcr-online.target
             
                 [Service]
-                ExecStart=/usr/bin/docker run --rm -u 0 -p 8787:8787 -p 6111:6111 --name=broadsea-methodslibrary -v /etc/ohdsi-scripts/:/ohdsi-scripts gcr.io/ohdsi-in-a-box/broadsea-methods-bigquery
+                Environment="HOME=/home/cloudservice"
+                ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+                ExecStart=/usr/bin/docker run --rm -u 0 -p 8787:8787 -p 6111:6111 --name=broadsea-methodslibrary -v /etc/ohdsi-scripts/:/ohdsi-scripts gcr.io/{{ properties['containerProject'] }}/broadsea-methods-bigquery
                 ExecStop=/usr/bin/docker stop broadsea-methodslibrary
                 ExecStopPost=/usr/bin/docker rm broadsea-methodslibrary
                 Restart=on-failure
@@ -66,8 +69,12 @@ resources:
               content: |
                 [Unit]
                 Description=Start the broadsea webtools docker container
+                Wants=gcr-online.target
+                After=gcr-online.target
             
                 [Service]
+                Environment="HOME=/home/cloudservice"
+                ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
                 ExecStart=/usr/bin/docker run --rm -u 0 -p 8080:8080 --name=broadsea-webtools \
                   -v /etc/ohdsi-scripts/:/ohdsi-scripts \
                   --env=WEBAPI_URL=http://localhost:8080 \
@@ -88,7 +95,7 @@ resources:
                   --env=FLYWAY_DATASOURCE_USERNAME=ohdsi-postgres-user \
                   --env=FLYWAY_DATASOURCE_PASSWORD=ohdsi-postgres-password \
                   --env=FLYWAY_LOCATIONS=classpath:db/migration/postgresql \
-                  gcr.io/ohdsi-in-a-box/broadsea-webtools-bigquery
+                  gcr.io/{{ properties['containerProject'] }}/broadsea-webtools-bigquery
                 ExecStop=/usr/bin/docker stop broadsea-webtools
                 ExecStopPost=/usr/bin/docker rm broadsea-webtools
                 Restart=on-failure
@@ -123,12 +130,14 @@ resources:
               content: |
                 install.packages("devtools")
                 library(devtools)
-                install_local(path="/ohdsi-deployment/DatabaseConnector")
+                install.packages("rJava",type='source')
+                #install_local(path="/ohdsi-deployment/rJava")
                 install_local(path="/ohdsi-deployment/SqlRender")
+                install_local(path="/ohdsi-deployment/DatabaseConnector")
                 install_local(path="/ohdsi-deployment/Achilles")
                 library(Achilles)
                 connectionDetails = createConnectionDetails(dbms="bigquery", server="{{ env['project'] }}", pathToDriver = "/tmp/drivers", user="", password="")
-                achilles(connectionDetails, cdmDatabaseSchema="{{ properties['cdmDataset'] }}", resultsDatabaseSchema="{{ properties['ohdsiDataset'] }}", sourceName="OHDSI CDM V5 Database", cdmVersion = "5", vocabDatabaseSchema = "{{ properties['cdmDataset'] }}", runHeel=TRUE, conceptHierarchy = TRUE)
+                achilles(connectionDetails, cdmDatabaseSchema="{{ properties['cdmDataset'] }}", resultsDatabaseSchema="{{ properties['ohdsiDataset'] }}", sourceName="OHDSI CDM V5 Database", cdmVersion = "5", vocabDatabaseSchema = "{{ properties['cdmDataset'] }}", runHeel=TRUE, conceptHierarchy = TRUE, createIndices = FALSE)
 
             - path: /etc/ohdsi-scripts/update_source.py
               permissions: 0555
@@ -548,6 +557,31 @@ resources:
         type: string
       - name: vocabulary_version
         type: string
+- name: cdmDataset_metadata
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: metadata
+    schema:
+      fields:
+      - name: metadata_concept_id
+        type: integer
+      - name: metadata_type_concept_id
+        type: integer
+      - name: name
+        type: string
+      - name: value_as_string
+        type: string
+      - name: value_as_concept_id
+        type: integer
+      - name: metadata_date
+        type: date
+      - name: metadata_datetime
+        type: timestamp
 - name: cdmDataset_person
   type: bigquery.v2.table
   metadata:
@@ -612,12 +646,8 @@ resources:
         type: integer
       - name: observation_period_start_date
         type: date
-      - name: observation_period_start_datetime
-        type: timestamp
       - name: observation_period_end_date
         type: date
-      - name: observation_period_end_datetime
-        type: timestamp
       - name: period_type_concept_id
         type: integer
 - name: cdmDataset_specimen
@@ -731,6 +761,55 @@ resources:
         type: string
       - name: preceding_visit_occurrence_id
         type: integer
+- name: cdmDataset_visit_detail
+  type: bigquery.v2.table
+  metadata:
+    dependsOn:
+    - cdmDatasetResource
+  properties:
+    datasetId: {{ properties['cdmDataset'] }}
+    tableReference:
+      tableId: visit_detail
+    schema:
+      fields:
+      - name: visit_detail_id
+        type: integer
+      - name: person_id
+        type: integer
+      - name: visit_detail_concept_id
+        type: integer
+      - name: visit_start_date
+        type: date
+      - name: visit_start_datetime
+        type: timestamp
+      - name: visit_end_date
+        type: date
+      - name: visit_end_datetime
+        type: timestamp
+      - name: visit_type_concept_id
+        type: integer
+      - name: provider_id
+        type: integer
+      - name: care_site_id
+        type: integer
+      - name: admitting_source_concept_id
+        type: integer
+      - name: discharge_to_concept_id
+        type: integer
+      - name: preceding_visit_detail_id
+        type: integer
+      - name: visit_source_value
+        type: string
+      - name: visit_source_concept_id
+        type: integer
+      - name: admitting_source_value
+        type: string
+      - name: discharge_to_source_value
+        type: string
+      - name: visit_detail_parent_id
+        type: integer
+      - name: visit_occurrence_id
+        type: integer
 - name: cdmDataset_procedure_occurrence
   type: bigquery.v2.table
   metadata:
@@ -762,11 +841,13 @@ resources:
         type: integer
       - name: visit_occurrence_id
         type: integer
+      - name: visit_detail_id
+        type: integer
       - name: procedure_source_value
         type: string
       - name: procedure_source_concept_id
         type: integer
-      - name: qualifier_source_value
+      - name: modifier_source_value
         type: string
 - name: cdmDataset_drug_exposure
   type: bigquery.v2.table
@@ -815,6 +896,8 @@ resources:
         type: integer
       - name: visit_occurrence_id
         type: integer
+      - name: visit_detail_id
+        type: integer
       - name: drug_source_value
         type: string
       - name: drug_source_concept_id
@@ -858,6 +941,8 @@ resources:
         type: integer
       - name: visit_occurrence_id
         type: integer
+      - name: visit_detail_id
+        type: integer
       - name: device_source_value
         type: string
       - name: device_source_concept_id
@@ -895,6 +980,8 @@ resources:
         type: integer
       - name: visit_occurrence_id
         type: integer
+      - name: visit_detail_id
+        type: integer
       - name: condition_source_value
         type: string
       - name: condition_source_concept_id
@@ -922,6 +1009,8 @@ resources:
         type: integer
       - name: measurement_date
         type: date
+      - name: measurement_time
+        type: string
       - name: measurement_datetime
         type: timestamp
       - name: measurement_type_concept_id
@@ -941,6 +1030,8 @@ resources:
       - name: provider_id
         type: integer
       - name: visit_occurrence_id
+        type: integer
+      - name: visit_detail_id
         type: integer
       - name: measurement_source_value
         type: string
@@ -984,6 +1075,8 @@ resources:
       - name: provider_id
         type: integer
       - name: visit_occurrence_id
+        type: integer
+      - name: visit_detail_id
         type: integer
       - name: note_source_value
         type: string
@@ -1062,6 +1155,8 @@ resources:
       - name: provider_id
         type: integer
       - name: visit_occurrence_id
+        type: integer
+      - name: visit_detail_id
         type: integer
       - name: observation_source_value
         type: string
@@ -1198,12 +1293,32 @@ resources:
         type: date
       - name: payer_plan_period_end_date
         type: date
+      - name: payer_concept_id
+        type: integer
       - name: payer_source_value
         type: string
+      - name: payer_source_concept_id
+        type: integer
+      - name: plan_concept_id
+        type: integer
       - name: plan_source_value
         type: string
+      - name: plan_source_concept_id
+        type: integer
+      - name: sponsor_concept_id
+        type: integer
+      - name: sponsor_source_value
+        type: string
+      - name: sponsor_source_concept_id
+        type: integer
       - name: family_source_value
         type: string
+      - name: stop_reason_concept_id
+        type: integer
+      - name: stop_reason_source_value
+        type: integer
+      - name: stop_reason_source_concept_id
+        type: integer
 - name: cdmDataset_cost
   type: bigquery.v2.table
   metadata:
@@ -1291,12 +1406,12 @@ resources:
       fields:
       - name: cohort_definition_id
         type: integer
+      - name: subject_id
+        type: integer
       - name: cohort_start_date
         type: date
       - name: cohort_end_date
         type: date
-      - name: subject_id
-        type: integer
       - name: attribute_definition_id
         type: integer
       - name: value_as_number
@@ -1376,383 +1491,3 @@ resources:
         type: date
       - name: condition_occurrence_count
         type: integer
-- name: ohdsiDataset_cohort
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: cohort
-    schema:
-      fields:
-      - name: cohort_definition_id
-        type: integer
-      - name: subject_id
-        type: integer
-      - name: cohort_start_date
-        type: date
-      - name: cohort_end_date
-        type: date
-- name: ohdsiDataset_cohort_inclusion
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: cohort_inclusion
-    schema:
-      fields:
-      - name: cohort_definition_id
-        type: integer
-      - name: rule_sequence
-        type: integer
-      - name: name
-        type: string
-      - name: description
-        type: string
-- name: ohdsiDataset_cohort_inclusion_result
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: cohort_inclusion_result
-    schema:
-      fields:
-      - name: cohort_definition_id
-        type: integer
-      - name: inclusion_rule_mask
-        type: integer
-      - name: person_count
-        type: integer
-- name: ohdsiDataset_cohort_inclusion_stats
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: cohort_inclusion_stats
-    schema:
-      fields:
-      - name: cohort_definition_id
-        type: integer
-      - name: rule_sequence
-        type: integer
-      - name: person_count
-        type: integer
-      - name: gain_count
-        type: integer
-      - name: person_total
-        type: integer
-- name: ohdsiDataset_cohort_summary_stats
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: cohort_summary_stats
-    schema:
-      fields:
-      - name: cohort_definition_id
-        type: integer
-      - name: base_count
-        type: integer
-      - name: final_count
-        type: integer
-- name: ohdsiDataset_feas_study_inclusion_stats
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: feas_study_inclusion_stats
-    schema:
-      fields:
-      - name: study_id
-        type: integer
-      - name: rule_sequence
-        type: integer
-      - name: name
-        type: string
-      - name: person_count
-        type: integer
-      - name: gain_count
-        type: integer
-      - name: person_total
-        type: integer
-- name: ohdsiDataset_feas_study_index_stats
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: feas_study_index_stats
-    schema:
-      fields:
-      - name: study_id
-        type: integer
-      - name: person_count
-        type: integer
-      - name: match_count
-        type: integer
-- name: ohdsiDataset_feas_study_result
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: feas_study_result
-    schema:
-      fields:
-      - name: study_id
-        type: integer
-      - name: inclusion_rule_mask
-        type: integer
-      - name: person_count
-        type: integer
-- name: ohdsiDataset_heracles_analysis
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: heracles_analysis
-    schema:
-      fields:
-      - name: analysis_id
-        type: integer
-      - name: analysis_name
-        type: string
-      - name: stratum_1_name
-        type: string
-      - name: stratum_2_name
-        type: string
-      - name: stratum_3_name
-        type: string
-      - name: stratum_4_name
-        type: string
-      - name: stratum_5_name
-        type: string
-      - name: analysis_type
-        type: string
-- name: ohdsiDataset_heracles_heel_results
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: heracles_heel_results
-    schema:
-      fields:
-      - name: cohort_definition_id
-        type: integer
-      - name: analysis_id
-        type: integer
-      - name: heracles_heel_warning
-        type: string
-- name: ohdsiDataset_heracles_results
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: heracles_results
-    schema:
-      fields:
-      - name: cohort_definition_id
-        type: integer
-      - name: analysis_id
-        type: integer
-      - name: stratum_1
-        type: string
-      - name: stratum_2
-        type: string
-      - name: stratum_3
-        type: string
-      - name: stratum_4
-        type: string
-      - name: stratum_5
-        type: string
-      - name: count_value
-        type: integer
-      - name: last_update_time
-        type: timestamp
-- name: ohdsiDataset_heracles_results_dist
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: heracles_results_dist
-    schema:
-      fields:
-      - name: cohort_definition_id
-        type: integer
-      - name: analysis_id
-        type: integer
-      - name: stratum_1
-        type: string
-      - name: stratum_2
-        type: string
-      - name: stratum_3
-        type: string
-      - name: stratum_4
-        type: string
-      - name: stratum_5
-        type: string
-      - name: count_value
-        type: integer
-      - name: min_value
-        type: float
-      - name: max_value
-        type: float
-      - name: avg_value
-        type: float
-      - name: stdev_value
-        type: float
-      - name: median_value
-        type: float
-      - name: p10_value
-        type: float
-      - name: p25_value
-        type: float
-      - name: p75_value
-        type: float
-      - name: p90_value
-        type: float
-      - name: last_update_time
-        type: timestamp
-- name: ohdsiDataset_ir_analysis_dist
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: ir_analysis_dist
-    schema:
-      fields:
-      - name: analysis_id
-        type: integer
-      - name: target_id
-        type: integer
-      - name: outcome_id
-        type: integer
-      - name: strata_sequence
-        type: integer
-      - name: dist_type
-        type: integer
-      - name: total
-        type: integer
-      - name: avg_value
-        type: float
-      - name: std_dev
-        type: float
-      - name: min_value
-        type: integer
-      - name: p10_value
-        type: integer
-      - name: p25_value
-        type: integer
-      - name: median_value
-        type: integer
-      - name: p75_value
-        type: integer
-      - name: p90_value
-        type: integer
-      - name: max_value
-        type: integer
-- name: ohdsiDataset_ir_analysis_result
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: ir_analysis_result
-    schema:
-      fields:
-      - name: analysis_id
-        type: integer
-      - name: target_id
-        type: integer
-      - name: outcome_id
-        type: integer
-      - name: strata_mask
-        type: integer
-      - name: person_count
-        type: integer
-      - name: time_at_risk
-        type: integer
-      - name: cases
-        type: integer
-- name: ohdsiDataset_ir_analysis_strata_stats
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: ir_analysis_strata_stats
-    schema:
-      fields:
-      - name: analysis_id
-        type: integer
-      - name: target_id
-        type: integer
-      - name: outcome_id
-        type: integer
-      - name: strata_sequence
-        type: integer
-      - name: person_count
-        type: integer
-      - name: time_at_risk
-        type: integer
-      - name: cases
-        type: integer
-- name: ohdsiDataset_ir_strata
-  type: bigquery.v2.table
-  metadata:
-    dependsOn:
-    - ohdsiDatasetResource
-  properties:
-    datasetId: {{ properties['ohdsiDataset'] }}
-    tableReference:
-      tableId: ir_strata
-    schema:
-      fields:
-      - name: analysis_id
-        type: integer
-      - name: strata_sequence
-        type: integer
-      - name: name
-        type: string
-      - name: description
-        type: string

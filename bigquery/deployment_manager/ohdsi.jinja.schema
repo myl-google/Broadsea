@@ -32,6 +32,9 @@ properties:
   region:
     description: Region in which the addresses are allocated
     type: string
+  containerProject:
+    description: Project id where the broadsea images are hosted in gcr.io
+    type: string
   tempDataset:
     description: BigQuery dataset for storing temp tables
     type: string
