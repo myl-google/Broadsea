@@ -21,7 +21,7 @@ resources:
     properties:
       zone: us-central1-a
       region: us-central1
-      containerProject: ohdsi-test-4
+      containerProject: cloud-healthcare-containers
       tempDataset: temp
       cdmDataset: cdm
       ohdsiDataset: ohdsi
