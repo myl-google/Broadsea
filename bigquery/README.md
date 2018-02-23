@@ -31,23 +31,20 @@ Now you can run the following to create a full deployment:
 create-deployment.sh
 ```
 
-This will take several minutes and create a VM to run Broadsea (which
-includes RStudio and Atlas), a Postgresql instance to host the OHDSI
-database schema, and bigquery datasets and tables to host the Common
-Data Model (aka OMOP) schema.  It is recommended that you load your
-data into the created Bigquery tables to ensure that the schema
-version matches what is expected by the software.  However, it is also
-possible to point the deployment at existing data.  Avoid changing the
-schema of the tables when you load them since the OHDSI software
-expects the specific schema version that was used to create the
-tables.  For example, if you're loading CSVs into the person table
-from the proj1 project then first run "bq --project_id proj1 show
---schema cdm1.person" to get the json schema and then use that schema
-to load the csv.  Alternatively, you can load the CSV into a temporary
-staging table and then run a select statement that re-arranges,
-renames, and casts columns as needed and writes the result to a
-destination table using "append to table" to avoid changing the
-schema.
+This will take several minutes and create a VM to run Broadsea (which includes
+RStudio and Atlas), a Postgresql instance to host the OHDSI database schema,
+and bigquery datasets and tables to host the Common Data Model (aka OMOP)
+schema.  It is recommended that you load your data into the created Bigquery
+tables to ensure that the schema version matches what is expected by the
+software.  However, it is also possible to point the deployment at existing
+data.  Avoid changing the schema of the tables when you load them since the
+OHDSI software expects specific schema version.  For example, if you're loading
+CSVs into the person table from the proj1 project then first run "bq
+--project_id proj1 show --schema cdm1.person" to get the json schema and then
+use that schema to load the csv.  Alternatively, you can load the CSV into a
+temporary staging table and then run a select statement that re-arranges,
+renames, and casts columns as needed and writes the result to a destination
+table using "append to table" to avoid changing the schema.
 
 After your data is loaded, you can ssh to the VM:
 
@@ -105,38 +102,34 @@ Explanations of each file:
   interaction with bigquery as they happen
 
 In addition to the VM, the deployment includes a [cloud sql
-postgres](https://cloud.google.com/sql/docs/postgres/) to host the
+postgres](https://cloud.google.com/sql/docs/postgres/) instance to host the
 OHDSI schema and bigquery datasets to host the CDM schema.
 
 ## Debugging
 
-If you can't connect to RStudio or Atlas, then use connect.sh to
-connect to the VM and run "docker ps" to confirm the methods and
-webtools containers have started (this may take a few minutes after
-the VM is first created). If not, some of the following commands are
-useful for debugging:
+If you can't connect to RStudio or Atlas, then use connect.sh to connect to the
+VM and run "docker ps" to confirm the methods and webtools containers have
+started (this may take a few minutes after the VM is first created). If not,
+some of the following commands are useful for debugging:
 
-- "sudo systemctl status broadsea-methods.service" or "sudo systemctl
-  status broadsea-webtools.service" give details of why the services
-  failed
+- "sudo systemctl status broadsea-methods.service" or "sudo systemctl status
+  broadsea-webtools.service" give details of why the services failed
 
-- "sudo journalctl" shows the systemd logs. You can search for
-  messages with the substring "broadsea".
+- "sudo journalctl" shows the systemd logs. You can search for messages with
+  the substring "broadsea".
 
-- "sudo systemctl start <service name>" and "sudo systemctl stop
-  <service name>" can be used to start and stop services from
-  /etc/systemd/system as part of investigating
+- "sudo systemctl start <service name>" and "sudo systemctl stop <service
+  name>" can be used to start and stop services from /etc/systemd/system as
+  part of investigating
 
-One possible problem is lack of permission to access the images.  If
-this happens, then please contact the person that pointed you to these
-instructions.
+One possible problem is lack of permission to access the images.  If this
+happens, then please contact the person that pointed you to these instructions.
 
-If you encounter problems with functionality in Atlas, run the
-tail_weblog.sh script and note any SQL errors that show up while using
-the UI.  There are numerous data and schema issues that can happen
-when loading data or transforming it to the CDM.  Interpreting the SQL
-errors often gives clues about these data problems and how to fix
-them.
+If you encounter problems with functionality in Atlas, run the tail_weblog.sh
+script and note any SQL errors that show up while using the UI.  There are
+numerous data and schema issues that can happen when loading data or
+transforming it to the CDM.  Interpreting the SQL errors often gives clues
+about these data problems and how to fix them.
 
 # Manual setup instructions for Broadsea using docker-compose in a VM
 
