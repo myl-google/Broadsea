@@ -1,0 +1,58 @@
+[
+    {
+        "name": "procedure_occurrence_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "person_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "procedure_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "procedure_date",
+        "type": "DATE"
+    },
+    {
+        "name": "procedure_datetime",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "procedure_type_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "modifier_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "quantity",
+        "type": "INTEGER"
+    },
+    {
+        "name": "provider_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "visit_occurrence_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "visit_detail_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "procedure_source_value",
+        "type": "STRING"
+    },
+    {
+        "name": "procedure_source_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "modifier_source_value",
+        "type": "STRING"
+    }
+]

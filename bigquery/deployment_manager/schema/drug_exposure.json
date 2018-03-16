@@ -1,0 +1,94 @@
+[
+    {
+        "name": "drug_exposure_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "person_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "drug_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "drug_exposure_start_date",
+        "type": "DATE"
+    },
+    {
+        "name": "drug_exposure_start_datetime",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "drug_exposure_end_date",
+        "type": "DATE"
+    },
+    {
+        "name": "drug_exposure_end_datetime",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "verbatim_end_date",
+        "type": "DATE"
+    },
+    {
+        "name": "drug_type_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "stop_reason",
+        "type": "STRING"
+    },
+    {
+        "name": "refills",
+        "type": "INTEGER"
+    },
+    {
+        "name": "quantity",
+        "type": "FLOAT"
+    },
+    {
+        "name": "days_supply",
+        "type": "INTEGER"
+    },
+    {
+        "name": "sig",
+        "type": "STRING"
+    },
+    {
+        "name": "route_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "lot_number",
+        "type": "STRING"
+    },
+    {
+        "name": "provider_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "visit_occurrence_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "visit_detail_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "drug_source_value",
+        "type": "STRING"
+    },
+    {
+        "name": "drug_source_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "route_source_value",
+        "type": "STRING"
+    },
+    {
+        "name": "dose_unit_source_value",
+        "type": "STRING"
+    }
+]

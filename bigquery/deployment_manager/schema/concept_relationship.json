@@ -1,0 +1,26 @@
+[
+    {
+        "name": "concept_id_1",
+        "type": "INTEGER"
+    },
+    {
+        "name": "concept_id_2",
+        "type": "INTEGER"
+    },
+    {
+        "name": "relationship_id",
+        "type": "STRING"
+    },
+    {
+        "name": "valid_start_date",
+        "type": "DATE"
+    },
+    {
+        "name": "valid_end_date",
+        "type": "DATE"
+    },
+    {
+        "name": "invalid_reason",
+        "type": "STRING"
+    }
+]

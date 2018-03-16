@@ -1,0 +1,18 @@
+[
+    {
+        "name": "cohort_definition_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "subject_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "cohort_start_date",
+        "type": "DATE"
+    },
+    {
+        "name": "cohort_end_date",
+        "type": "DATE"
+    }
+]

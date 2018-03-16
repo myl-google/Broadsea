@@ -1,0 +1,42 @@
+[
+    {
+        "name": "concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "concept_name",
+        "type": "STRING"
+    },
+    {
+        "name": "domain_id",
+        "type": "STRING"
+    },
+    {
+        "name": "vocabulary_id",
+        "type": "STRING"
+    },
+    {
+        "name": "concept_class_id",
+        "type": "STRING"
+    },
+    {
+        "name": "standard_concept",
+        "type": "STRING"
+    },
+    {
+        "name": "concept_code",
+        "type": "STRING"
+    },
+    {
+        "name": "valid_start_date",
+        "type": "DATE"
+    },
+    {
+        "name": "valid_end_date",
+        "type": "DATE"
+    },
+    {
+        "name": "invalid_reason",
+        "type": "STRING"
+    }
+]

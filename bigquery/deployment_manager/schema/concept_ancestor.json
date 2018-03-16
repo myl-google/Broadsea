@@ -1,0 +1,18 @@
+[
+    {
+        "name": "ancestor_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "descendant_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "min_levels_of_separation",
+        "type": "INTEGER"
+    },
+    {
+        "name": "max_levels_of_separation",
+        "type": "INTEGER"
+    }
+]

@@ -1,0 +1,22 @@
+[
+    {
+        "name": "domain_concept_id_1",
+        "type": "INTEGER"
+    },
+    {
+        "name": "fact_id_1",
+        "type": "INTEGER"
+    },
+    {
+        "name": "domain_concept_id_2",
+        "type": "INTEGER"
+    },
+    {
+        "name": "fact_id_2",
+        "type": "INTEGER"
+    },
+    {
+        "name": "relationship_concept_id",
+        "type": "INTEGER"
+    }
+]

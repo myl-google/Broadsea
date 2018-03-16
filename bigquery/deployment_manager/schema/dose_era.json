@@ -1,0 +1,30 @@
+[
+    {
+        "name": "dose_era_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "person_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "drug_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "unit_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "dose_value",
+        "type": "FLOAT"
+    },
+    {
+        "name": "dose_era_start_date",
+        "type": "DATE"
+    },
+    {
+        "name": "dose_era_end_date",
+        "type": "DATE"
+    }
+]

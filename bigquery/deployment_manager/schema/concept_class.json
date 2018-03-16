@@ -1,0 +1,14 @@
+[
+    {
+        "name": "concept_class_id",
+        "type": "STRING"
+    },
+    {
+        "name": "concept_class_name",
+        "type": "STRING"
+    },
+    {
+        "name": "concept_class_concept_id",
+        "type": "INTEGER"
+    }
+]

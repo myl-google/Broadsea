@@ -1,0 +1,30 @@
+[
+    {
+        "name": "metadata_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "metadata_type_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "name",
+        "type": "STRING"
+    },
+    {
+        "name": "value_as_string",
+        "type": "STRING"
+    },
+    {
+        "name": "value_as_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "metadata_date",
+        "type": "DATE"
+    },
+    {
+        "name": "metadata_datetime",
+        "type": "TIMESTAMP"
+    }
+]
