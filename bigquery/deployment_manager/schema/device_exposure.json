@@ -1,0 +1,62 @@
+[
+    {
+        "name": "device_exposure_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "person_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "device_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "device_exposure_start_date",
+        "type": "DATE"
+    },
+    {
+        "name": "device_exposure_start_datetime",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "device_exposure_end_date",
+        "type": "DATE"
+    },
+    {
+        "name": "device_exposure_end_datetime",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "device_type_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "unique_device_id",
+        "type": "STRING"
+    },
+    {
+        "name": "quantity",
+        "type": "INTEGER"
+    },
+    {
+        "name": "provider_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "visit_occurrence_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "visit_detail_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "device_source_value",
+        "type": "STRING"
+    },
+    {
+        "name": "device_source_concept_id",
+        "type": "INTEGER"
+    }
+]

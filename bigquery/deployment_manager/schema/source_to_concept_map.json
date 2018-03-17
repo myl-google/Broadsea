@@ -1,0 +1,38 @@
+[
+    {
+        "name": "source_code",
+        "type": "STRING"
+    },
+    {
+        "name": "source_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "source_vocabulary_id",
+        "type": "STRING"
+    },
+    {
+        "name": "source_code_description",
+        "type": "STRING"
+    },
+    {
+        "name": "target_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "target_vocabulary_id",
+        "type": "STRING"
+    },
+    {
+        "name": "valid_start_date",
+        "type": "DATE"
+    },
+    {
+        "name": "valid_end_date",
+        "type": "DATE"
+    },
+    {
+        "name": "invalid_reason",
+        "type": "STRING"
+    }
+]

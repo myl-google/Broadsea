@@ -1,0 +1,30 @@
+[
+    {
+        "name": "drug_era_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "person_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "drug_concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "drug_era_start_date",
+        "type": "DATE"
+    },
+    {
+        "name": "drug_era_end_date",
+        "type": "DATE"
+    },
+    {
+        "name": "drug_exposure_count",
+        "type": "INTEGER"
+    },
+    {
+        "name": "gap_days",
+        "type": "INTEGER"
+    }
+]

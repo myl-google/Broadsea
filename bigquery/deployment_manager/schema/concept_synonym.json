@@ -1,0 +1,14 @@
+[
+    {
+        "name": "concept_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "concept_synonym_name",
+        "type": "STRING"
+    },
+    {
+        "name": "language_concept_id",
+        "type": "INTEGER"
+    }
+]

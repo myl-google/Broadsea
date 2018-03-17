@@ -1,0 +1,22 @@
+[
+    {
+        "name": "observation_period_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "person_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "observation_period_start_date",
+        "type": "DATE"
+    },
+    {
+        "name": "observation_period_end_date",
+        "type": "DATE"
+    },
+    {
+        "name": "period_type_concept_id",
+        "type": "INTEGER"
+    }
+]

@@ -1,0 +1,14 @@
+[
+    {
+        "name": "domain_id",
+        "type": "STRING"
+    },
+    {
+        "name": "domain_name",
+        "type": "STRING"
+    },
+    {
+        "name": "domain_concept_id",
+        "type": "INTEGER"
+    }
+]
