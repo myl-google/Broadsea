@@ -196,8 +196,8 @@ resources:
                 #!/bin/bash
                 # Utility to view the tail of the webtools log
                 export WEBTOOLS_ID=`docker ps -aqf "name=broadsea-webtools"`
-                export ERRLOG=`docker exec $WEBTOOLS_ID /usr/bin/find /var/log/supervisor | grep stderr`
-                docker exec -i -t $WEBTOOLS_ID tail -f $ERRLOG
+                export LOGS=`docker exec $WEBTOOLS_ID /usr/bin/find /var/log/supervisor | grep std`
+                docker exec -i -t $WEBTOOLS_ID tail -f $LOGS
 
             runcmd:
             - systemctl daemon-reload
