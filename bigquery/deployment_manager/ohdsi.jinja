@@ -110,7 +110,7 @@ resources:
                 
                 -- OHDSI CDM source
                 INSERT INTO ohdsi.source(source_id, source_name, source_key, source_connection, source_dialect)
-                VALUES (1, 'OHDSI CDM V5 Database', 'OHDSI-CDMV5', 'jdbc:BQDriver:{{ env['project'] }}', 'bigquery');
+                VALUES (1, 'OHDSI CDM V5 Database', 'OHDSI-CDMV5', 'jdbc:BQDriver:{{ properties['datasetProject'] or env['project'] }}', 'bigquery');
                 
                 -- CDM daimon
                 INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (1, 1, 0, '{{ properties['cdmDataset'] }}', 2);
@@ -136,7 +136,7 @@ resources:
                 install_local(path="/ohdsi-deployment/DatabaseConnector")
                 install_local(path="/ohdsi-deployment/Achilles")
                 library(Achilles)
-                connectionDetails = createConnectionDetails(dbms="bigquery", server="{{ env['project'] }}", pathToDriver = "/tmp/drivers", user="", password="")
+                connectionDetails = createConnectionDetails(dbms="bigquery", server="{{ properties['datasetProject'] or env['project'] }}", pathToDriver = "/tmp/drivers", user="", password="")
                 achilles(connectionDetails, cdmDatabaseSchema="{{ properties['cdmDataset'] }}", resultsDatabaseSchema="{{ properties['ohdsiDataset'] }}", sourceName="OHDSI CDM V5 Database", cdmVersion = "5", vocabDatabaseSchema = "{{ properties['cdmDataset'] }}", runHeel=TRUE, conceptHierarchy = TRUE, createIndices = FALSE)
 
             - path: /etc/ohdsi-scripts/update_source.py
@@ -231,6 +231,7 @@ resources:
         authorizedNetworks:
         - name: broadsea-vm
           value: $(ref.{{ BASE_NAME }}-address.address)
+{% if not properties['datasetProject'] %}
 - name: tempDatasetResource
   type: bigquery.v2.dataset
   properties:
@@ -1491,3 +1492,4 @@ resources:
         type: date
       - name: condition_occurrence_count
         type: integer
+{% endif %}
