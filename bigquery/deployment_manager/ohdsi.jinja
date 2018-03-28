@@ -24,6 +24,10 @@ limitations under the License.
 {{ COMPUTE_URL_BASE }}projects/{{ project }}/zones/{{ zone }}/{{ collection }}/{{ name }}
 {%- endmacro %}
 
+{% macro DatasetRef(project, dataset) -%}
+`{{ project }}`.{{ dataset }}
+{%- endmacro %}
+
 resources:
 - name: {{ BASE_NAME }}-address
   type: compute.beta.address
@@ -119,10 +123,10 @@ resources:
                 INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (2, 1, 1, '{{ properties['cdmDataset'] }}', 2);
                 
                 -- RESULTS daimon
-                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (3, 1, 2, '{{ properties['ohdsiDataset']}}', 2);
+                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (3, 1, 2, '{{ DatasetRef(properties['datasetProject'] or env['project']), properties['ohdsiDataset']) }}', 2);
                 
                 -- EVIDENCE daimon
-                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (4, 1, 3, '{{ properties['ohdsiDataset'] }}', 2);
+                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (4, 1, 3, '{{ DatasetRef(properties['datasetProject'] or env['project']), properties['ohdsiDataset']) }}', 2);
 
             - path: /etc/ohdsi-scripts/runAchilles.R
               permissions: 0666
@@ -137,7 +141,7 @@ resources:
                 install_local(path="/ohdsi-deployment/Achilles")
                 library(Achilles)
                 connectionDetails = createConnectionDetails(dbms="bigquery", server="{{ properties['datasetProject'] or env['project'] }}", pathToDriver = "/tmp/drivers", user="", password="")
-                achilles(connectionDetails, cdmDatabaseSchema="{{ properties['cdmDataset'] }}", resultsDatabaseSchema="{{ properties['ohdsiDataset'] }}", sourceName="OHDSI CDM V5 Database", cdmVersion = "5", vocabDatabaseSchema = "{{ properties['cdmDataset'] }}", runHeel=TRUE, conceptHierarchy = TRUE, createIndices = FALSE)
+                achilles(connectionDetails, cdmDatabaseSchema="{{ properties['cdmDataset'] }}", resultsDatabaseSchema="{{ DatasetRef(properties['datasetProject'] or env['project']), properties['ohdsiDataset']) }}", sourceName="OHDSI CDM V5 Database", cdmVersion = "5", vocabDatabaseSchema = "{{ properties['cdmDataset'] }}", runHeel=TRUE, conceptHierarchy = TRUE, createIndices = FALSE)
 
             - path: /etc/ohdsi-scripts/update_source.py
               permissions: 0555
@@ -231,23 +235,23 @@ resources:
         authorizedNetworks:
         - name: broadsea-vm
           value: $(ref.{{ BASE_NAME }}-address.address)
-{% if not properties['datasetProject'] %}
 - name: tempDatasetResource
   type: bigquery.v2.dataset
   properties:
     datasetReference:
       datasetId: {{ properties['tempDataset'] }}
     defaultTableExpirationMs: 86400000
-- name: cdmDatasetResource
-  type: bigquery.v2.dataset
-  properties:
-    datasetReference:
-      datasetId: {{ properties['cdmDataset'] }}
 - name: ohdsiDatasetResource
   type: bigquery.v2.dataset
   properties:
     datasetReference:
       datasetId: {{ properties['ohdsiDataset'] }}
+{% if not properties['datasetProject'] %}
+- name: cdmDatasetResource
+  type: bigquery.v2.dataset
+  properties:
+    datasetReference:
+      datasetId: {{ properties['cdmDataset'] }}
 {# Generated bigquery schema below here #}
 - name: cdmDataset_concept
   type: bigquery.v2.table

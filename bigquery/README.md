@@ -35,10 +35,6 @@ project you want to deploy to is B (A and B can be the same):
     like `123456789000-compute@developer.gserviceaccount.com`. Select the dataset
     and click the caret on top right corner and choose "Share dataset" in the
     dropdown list, input the service account and click "Add" then "Save changes"
-- Edit permission on `ohdsi` and `temp`
-  * Select the dataset and click the caret on top right corner and choose 
-    "Share dataset" in the dropdown list, input the service account, choose
-    "Can edit" for permission and click "Add" then "Save changes"
 - bigquery.jobUser role on the project level
   * Go to IAM admin console, click "Add" on top and input service account for
     "New members" field and choose `BigQuery Job User` as role, save the change.
