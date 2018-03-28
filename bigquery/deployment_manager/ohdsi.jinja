@@ -123,10 +123,10 @@ resources:
                 INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (2, 1, 1, '{{ properties['cdmDataset'] }}', 2);
                 
                 -- RESULTS daimon
-                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (3, 1, 2, '{{ DatasetRef(properties['datasetProject'] or env['project']), properties['ohdsiDataset']) }}', 2);
+                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (3, 1, 2, '{{ DatasetRef(properties['datasetProject'] or env['project'], properties['ohdsiDataset']) }}', 2);
                 
                 -- EVIDENCE daimon
-                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (4, 1, 3, '{{ DatasetRef(properties['datasetProject'] or env['project']), properties['ohdsiDataset']) }}', 2);
+                INSERT INTO ohdsi.source_daimon( source_daimon_id, source_id, daimon_type, table_qualifier, priority) VALUES (4, 1, 3, '{{ DatasetRef(properties['datasetProject'] or env['project'], properties['ohdsiDataset']) }}', 2);
 
             - path: /etc/ohdsi-scripts/runAchilles.R
               permissions: 0666
@@ -141,7 +141,7 @@ resources:
                 install_local(path="/ohdsi-deployment/Achilles")
                 library(Achilles)
                 connectionDetails = createConnectionDetails(dbms="bigquery", server="{{ properties['datasetProject'] or env['project'] }}", pathToDriver = "/tmp/drivers", user="", password="")
-                achilles(connectionDetails, cdmDatabaseSchema="{{ properties['cdmDataset'] }}", resultsDatabaseSchema="{{ DatasetRef(properties['datasetProject'] or env['project']), properties['ohdsiDataset']) }}", sourceName="OHDSI CDM V5 Database", cdmVersion = "5", vocabDatabaseSchema = "{{ properties['cdmDataset'] }}", runHeel=TRUE, conceptHierarchy = TRUE, createIndices = FALSE)
+                achilles(connectionDetails, cdmDatabaseSchema="{{ properties['cdmDataset'] }}", resultsDatabaseSchema="{{ DatasetRef(properties['datasetProject'] or env['project'], properties['ohdsiDataset']) }}", sourceName="OHDSI CDM V5 Database", cdmVersion = "5", vocabDatabaseSchema = "{{ properties['cdmDataset'] }}", runHeel=TRUE, conceptHierarchy = TRUE, createIndices = FALSE)
 
             - path: /etc/ohdsi-scripts/update_source.py
               permissions: 0555
