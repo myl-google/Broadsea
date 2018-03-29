@@ -1,11 +1,13 @@
 """This is used to generate the deployment manager config for the CDM tables and OHDSI tables.
 
 To re-generate the tables:
-- edit ohdsi.jinja and remove all the biguery tables at the end
+- Run the following command to edit ohdsi.jinja and remove all the biguery tables at the end
+  sed -i -E '/\{\# Generated bigquery schema below here \#\}/,$d' ohdsi.jinja
 - download a release of the common data model at https://github.com/OHDSI/CommonDataModel/releases 
 - unzip the release and set the CDM_PATH environment variable to point at the directory
-- run: python create_bigquery_deployment.py -d cdmDataset -s ${CDM_PATH?}/PostgreSQL/OMOP\ CDM\ postgresql\ ddl.txt >> ohdsi.jinja
-  - Optional: append -b to the above command if you want to update the BigQuery schema files as well.
+- run:
+  python create_bigquery_deployment.py -d cdmDataset -b -s ${CDM_PATH?}/PostgreSQL/OMOP\ CDM\ postgresql\ ddl.txt >> ohdsi.jinja
+  echo "{% endif %}" >> ohdsi.jinja
 - ssh to the deployed vm and run the following:
   docker exec -i -t ${BROADSEA_WEBTOOLS_CONTAINER_ID?} pg_dump "host=${POSTGRES_HOST_IP} dbname=postgres user=postgres password=ohdsi" > ~/ohdsi.sql
 - on your workstation:
