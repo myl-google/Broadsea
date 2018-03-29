@@ -25,6 +25,23 @@ subdirectory.
 Edit ohdsi.yaml and update the zone or dataset names if desired.  Documentation
 is available in ohdsi.jinja.schema.
 
+If you want to reuse existing datasets for the deployment instead of creating
+new ones, you need to grant a few permissions that are needed for the VM to
+access the datasets. Say the project that hosts your datasets is A, and the
+project you want to deploy to is B (A and B can be the same):
+
+- Read permission on `cdm` dataset (or whatever name you change it to)
+  * Look up the default compute engine service account for B, it should look
+    like `123456789000-compute@developer.gserviceaccount.com`. Select the dataset
+    and click the caret on top right corner and choose "Share dataset" in the
+    dropdown list, input the service account and click "Add" then "Save changes"
+- bigquery.jobUser role on the project level
+  * Go to IAM admin console, click "Add" on top and input service account for
+    "New members" field and choose `BigQuery Job User` as role, save the change.
+
+You also need to specify project A in `ohdsi.yaml` as `datasetProject`, check
+out `ohdsi.jinja.schema` for more details.
+
 Now you can run the following to create a full deployment:
 
 ```

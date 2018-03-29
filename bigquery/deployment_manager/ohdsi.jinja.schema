@@ -51,3 +51,8 @@ properties:
       same name. Make sure to also change the "gcloud sql users" line in create-deployment.sh
       if you change this value.
     type: string
+  datasetProject:
+    description: >
+      The project that contains the CDM dataset. Only needed if you are reusing existing
+      datasets.
+    type: string
